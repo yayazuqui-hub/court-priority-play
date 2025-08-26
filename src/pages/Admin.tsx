@@ -1,0 +1,100 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { AdminPanel } from '@/components/AdminPanel';
+import { BookingsList } from '@/components/BookingsList';
+import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
+import { useAuth } from '@/hooks/useAuth';
+import { useRealtimeData } from '@/hooks/useRealtimeData';
+import { supabase } from '@/integrations/supabase/client';
+import { LogOut, ArrowLeft } from 'lucide-react';
+
+export default function Admin() {
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { user, signOut } = useAuth();
+  const { systemState, priorityQueue, bookings, loading } = useRealtimeData();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+
+      setIsAdmin(!!data);
+    };
+
+    checkAdminStatus();
+  }, [user]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  if (loading || isAdmin === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!user || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Acesso Negado</h1>
+          <p className="text-muted-foreground mb-4">
+            Você não tem permissão para acessar o painel administrativo.
+          </p>
+          <Button onClick={() => navigate('/')} variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Voltar ao Início
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/')}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+            <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+          </div>
+          <Button variant="outline" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sair
+          </Button>
+        </div>
+
+        <div className="space-y-6">
+          <AdminPanel 
+            systemState={systemState}
+            priorityQueue={priorityQueue}
+            bookings={bookings}
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PriorityQueueDisplay priorityQueue={priorityQueue} />
+            <BookingsList bookings={bookings} isAdmin={true} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
