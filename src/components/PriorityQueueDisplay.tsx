@@ -43,7 +43,7 @@ export function PriorityQueueDisplay({ priorityQueue }: PriorityQueueDisplayProp
                   <div>
                     <p className="font-medium">{item.profiles.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {item.profiles.phone}
+                      {item.profiles.email}
                     </p>
                   </div>
                 </div>

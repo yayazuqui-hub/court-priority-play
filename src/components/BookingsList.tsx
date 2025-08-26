@@ -103,7 +103,7 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
                     
                     <div className="text-sm text-muted-foreground space-y-1">
                       <p>Marcado por: {booking.profiles.name}</p>
-                      <p>Telefone: {booking.profiles.phone}</p>
+                      <p>Email: {booking.profiles.email}</p>
                       <p>Data: {formatDateTime(booking.created_at)}</p>
                     </div>
                     

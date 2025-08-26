@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (name: string, phone: string) => Promise<{ error: any }>;
-  signIn: (phone: string) => Promise<{ error: any }>;
+  signUp: (name: string, email: string) => Promise<{ error: any }>;
+  signIn: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
 }
 
@@ -38,20 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (name: string, phone: string) => {
+  const signUp = async (name: string, email: string) => {
     try {
-      // Use phone as email for auth
-      const email = `${phone}@volei.local`;
-      const password = phone; // Simple password system
-      
       const { data, error } = await supabase.auth.signUp({
         email,
-        password,
+        password: 'default123', // Password padrão simples
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             name,
-            phone,
+            email,
           }
         }
       });
@@ -65,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .insert({
             user_id: data.user.id,
             name,
-            phone,
+            email,
           });
 
         if (profileError) return { error: profileError };
@@ -77,14 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (phone: string) => {
+  const signIn = async (email: string) => {
     try {
-      const email = `${phone}@volei.local`;
-      const password = phone;
-      
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
+        password: 'default123',
       });
 
       return { error };

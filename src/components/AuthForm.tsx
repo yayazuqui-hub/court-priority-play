@@ -12,7 +12,7 @@ interface AuthFormProps {
 export function AuthForm({ onSuccess }: AuthFormProps) {
   const [isSignUp, setIsSignUp] = useState(true);
   const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   
   const { signUp, signIn } = useAuth();
@@ -24,7 +24,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
 
     try {
       if (isSignUp) {
-        if (!name.trim() || !phone.trim()) {
+        if (!name.trim() || !email.trim()) {
           toast({
             title: "Erro",
             description: "Por favor, preencha todos os campos.",
@@ -34,12 +34,12 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           return;
         }
 
-        const { error } = await signUp(name.trim(), phone.trim());
+        const { error } = await signUp(name.trim(), email.trim());
         if (error) {
           if (error.message?.includes('already registered')) {
             toast({
               title: "Usuário já existe",
-              description: "Este telefone já está cadastrado. Tente fazer login.",
+              description: "Este email já está cadastrado. Tente fazer login.",
               variant: "destructive"
             });
             setIsSignUp(false);
@@ -58,21 +58,21 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           onSuccess?.();
         }
       } else {
-        if (!phone.trim()) {
+        if (!email.trim()) {
           toast({
             title: "Erro",
-            description: "Por favor, digite seu telefone.",
+            description: "Por favor, digite seu email.",
             variant: "destructive"
           });
           setLoading(false);
           return;
         }
 
-        const { error } = await signIn(phone.trim());
+        const { error } = await signIn(email.trim());
         if (error) {
           toast({
             title: "Erro no login",
-            description: "Telefone não encontrado. Faça seu cadastro primeiro.",
+            description: "Email não encontrado. Faça seu cadastro primeiro.",
             variant: "destructive"
           });
           setIsSignUp(true);
@@ -102,7 +102,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           🏐 Quadra de Vôlei
         </CardTitle>
         <CardDescription>
-          {isSignUp ? 'Faça seu cadastro para entrar na fila' : 'Entre com seu telefone'}
+          {isSignUp ? 'Faça seu cadastro para entrar na fila' : 'Entre com seu email'}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,10 +120,10 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           )}
           <div>
             <Input
-              type="tel"
-              placeholder="Seu telefone (ex: 11999999999)"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+              type="email"
+              placeholder="Seu email (ex: joao@email.com)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>

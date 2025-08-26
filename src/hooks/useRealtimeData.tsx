@@ -15,7 +15,7 @@ export interface PriorityQueue {
   position: number;
   profiles: {
     name: string;
-    phone: string;
+    email: string;
   };
 }
 
@@ -27,7 +27,7 @@ export interface Booking {
   created_at: string;
   profiles: {
     name: string;
-    phone: string;
+    email: string;
   };
 }
 
@@ -55,7 +55,7 @@ export function useRealtimeData() {
           .from('priority_queue')
           .select(`
             *,
-            profiles (name, phone)
+            profiles (name, email)
           `)
           .order('position');
         
@@ -66,7 +66,7 @@ export function useRealtimeData() {
           .from('bookings')
           .select(`
             *,
-            profiles (name, phone)
+            profiles (name, email)
           `)
           .order('created_at', { ascending: false });
         
@@ -114,7 +114,7 @@ export function useRealtimeData() {
             .from('priority_queue')
             .select(`
               *,
-              profiles (name, phone)
+              profiles (name, email)
             `)
             .order('position')
             .then(({ data }) => {
@@ -139,7 +139,7 @@ export function useRealtimeData() {
             .from('bookings')
             .select(`
               *,
-              profiles (name, phone)
+              profiles (name, email)
             `)
             .order('created_at', { ascending: false })
             .then(({ data }) => {
