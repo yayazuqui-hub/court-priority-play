@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SystemState, PriorityQueue, Booking } from '@/hooks/useRealtimeData';
 import { Settings, Users, Clock, Trash2, Play, Square } from 'lucide-react';
+import GamesScheduleForm from './GamesScheduleForm';
 
 interface AdminPanelProps {
   systemState: SystemState | null;
@@ -244,6 +245,8 @@ export function AdminPanel({ systemState, priorityQueue, bookings }: AdminPanelP
           </div>
         </CardContent>
       </Card>
+
+      <GamesScheduleForm />
     </div>
   );
 }

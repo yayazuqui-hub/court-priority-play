@@ -31,10 +31,22 @@ export interface Booking {
   };
 }
 
+export interface GameSchedule {
+  id: string;
+  title: string;
+  location: string;
+  address?: string;
+  game_date: string;
+  game_time: string;
+  created_by: string;
+  created_at: string;
+}
+
 export function useRealtimeData() {
   const [systemState, setSystemState] = useState<SystemState | null>(null);
   const [priorityQueue, setPriorityQueue] = useState<PriorityQueue[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [gamesSchedule, setGamesSchedule] = useState<GameSchedule[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,6 +83,14 @@ export function useRealtimeData() {
           .order('created_at', { ascending: false });
         
         if (bookingsData) setBookings(bookingsData);
+
+        // Fetch games schedule
+        const { data: gamesData } = await supabase
+          .from('games_schedule')
+          .select('*')
+          .order('game_date', { ascending: true });
+        
+        if (gamesData) setGamesSchedule(gamesData);
 
         setLoading(false);
       } catch (error) {
@@ -149,10 +169,33 @@ export function useRealtimeData() {
       )
       .subscribe();
 
+    const gamesScheduleChannel = supabase
+      .channel('games-schedule-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'games_schedule'
+        },
+        () => {
+          // Refetch games schedule on any change
+          supabase
+            .from('games_schedule')
+            .select('*')
+            .order('game_date', { ascending: true })
+            .then(({ data }) => {
+              if (data) setGamesSchedule(data);
+            });
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(systemStateChannel);
       supabase.removeChannel(priorityQueueChannel);
       supabase.removeChannel(bookingsChannel);
+      supabase.removeChannel(gamesScheduleChannel);
     };
   }, []);
 
@@ -160,6 +203,7 @@ export function useRealtimeData() {
     systemState,
     priorityQueue,
     bookings,
+    gamesSchedule,
     loading,
   };
 }

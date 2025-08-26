@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminPanel } from '@/components/AdminPanel';
 import { BookingsList } from '@/components/BookingsList';
 import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
+import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, ArrowLeft } from 'lucide-react';
+import { LogOut, ArrowLeft, Calendar } from 'lucide-react';
 
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const { user, signOut } = useAuth();
-  const { systemState, priorityQueue, bookings, loading } = useRealtimeData();
+  const { systemState, priorityQueue, bookings, gamesSchedule, loading } = useRealtimeData();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -83,11 +85,23 @@ export default function Admin() {
         </div>
 
         <div className="space-y-6">
-          <AdminPanel 
+          <AdminPanel
             systemState={systemState}
             priorityQueue={priorityQueue}
             bookings={bookings}
           />
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Agenda de Jogos
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <GamesScheduleList games={gamesSchedule} isAdmin={true} />
+            </CardContent>
+          </Card>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <PriorityQueueDisplay priorityQueue={priorityQueue} />

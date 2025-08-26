@@ -49,6 +49,42 @@ export type Database = {
           },
         ]
       }
+      games_schedule: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string
+          game_date: string
+          game_time: string
+          id: string
+          location: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by: string
+          game_date: string
+          game_time: string
+          id?: string
+          location: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string
+          game_date?: string
+          game_time?: string
+          id?: string
+          location?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       priority_queue: {
         Row: {
           created_at: string
