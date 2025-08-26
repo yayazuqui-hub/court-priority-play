@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, Clock, MapPin, Trash2 } from "lucide-react";
+import { CalendarIcon, Clock, MapPin, Trash2, Edit } from "lucide-react";
 import { format, parseISO, isAfter } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import GamesScheduleEditForm from "./GamesScheduleEditForm";
 
 interface GameSchedule {
   id: string;
@@ -15,6 +17,7 @@ interface GameSchedule {
   address?: string;
   game_date: string;
   game_time: string;
+  created_by: string;
   created_at: string;
 }
 
@@ -25,6 +28,8 @@ interface GamesScheduleListProps {
 
 const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) => {
   const { toast } = useToast();
+  const [editingGame, setEditingGame] = useState<GameSchedule | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleDelete = async (gameId: string) => {
     try {
@@ -47,6 +52,11 @@ const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) =
         variant: "destructive"
       });
     }
+  };
+
+  const handleEdit = (game: GameSchedule) => {
+    setEditingGame(game);
+    setEditDialogOpen(true);
   };
 
   const isGameUpcoming = (gameDate: string, gameTime: string) => {
@@ -73,8 +83,9 @@ const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) =
   }
 
   return (
-    <div className="space-y-4">
-      {sortedGames.map((game) => {
+    <>
+      <div className="space-y-4">
+        {sortedGames.map((game) => {
         const isUpcoming = isGameUpcoming(game.game_date, game.game_time);
         const gameDateTime = new Date(`${game.game_date}T${game.game_time}`);
         
@@ -96,14 +107,24 @@ const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) =
                   </div>
                 </div>
                 {isAdmin && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(game.id)}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(game)}
+                      className="text-primary hover:text-primary"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(game.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
               </div>
             </CardHeader>
@@ -132,8 +153,22 @@ const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) =
             </CardContent>
           </Card>
         );
-      })}
-    </div>
+        })}
+      </div>
+      
+      {editingGame && (
+        <GamesScheduleEditForm
+          game={editingGame}
+          open={editDialogOpen}
+          onOpenChange={(open) => {
+            setEditDialogOpen(open);
+            if (!open) {
+              setEditingGame(null);
+            }
+          }}
+        />
+      )}
+    </>
   );
 };
 
