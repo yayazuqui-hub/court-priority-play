@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PriorityQueue } from '@/hooks/useRealtimeData';
+import { PriorityQueue, SystemState } from '@/hooks/useRealtimeData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -9,9 +9,10 @@ import { useState } from 'react';
 
 interface PriorityQueueDisplayProps {
   priorityQueue: PriorityQueue[];
+  systemState: SystemState | null;
 }
 
-export function PriorityQueueDisplay({ priorityQueue }: PriorityQueueDisplayProps) {
+export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQueueDisplayProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -147,26 +148,28 @@ export function PriorityQueueDisplay({ priorityQueue }: PriorityQueueDisplayProp
           </div>
         )}
         
-        <div className="mt-4 flex justify-center">
-          {userInQueue ? (
-            <Button 
-              variant="outline" 
-              onClick={leaveQueue} 
-              disabled={loading}
-              size="sm"
-            >
-              {loading ? 'Saindo...' : 'Sair da Fila'}
-            </Button>
-          ) : (
-            <Button 
-              onClick={joinQueue} 
-              disabled={loading || priorityQueue.length >= 12}
-              size="sm"
-            >
-              {loading ? 'Entrando...' : 'Entrar na Fila'}
-            </Button>
-          )}
-        </div>
+        {systemState?.is_priority_mode && (
+          <div className="mt-4 flex justify-center">
+            {userInQueue ? (
+              <Button 
+                variant="outline" 
+                onClick={leaveQueue} 
+                disabled={loading}
+                size="sm"
+              >
+                {loading ? 'Saindo...' : 'Sair da Fila'}
+              </Button>
+            ) : (
+              <Button 
+                onClick={joinQueue} 
+                disabled={loading || priorityQueue.length >= 12}
+                size="sm"
+              >
+                {loading ? 'Entrando...' : 'Entrar na Fila'}
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

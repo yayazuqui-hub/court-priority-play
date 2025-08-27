@@ -104,7 +104,7 @@ export default function Admin() {
           </Card>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PriorityQueueDisplay priorityQueue={priorityQueue} />
+            <PriorityQueueDisplay priorityQueue={priorityQueue} systemState={systemState} />
             <BookingsList bookings={bookings} isAdmin={true} />
           </div>
         </div>
