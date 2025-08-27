@@ -16,6 +16,7 @@ export interface PriorityQueue {
   profiles: {
     name: string;
     email: string;
+    gender: string;
   };
 }
 
@@ -67,7 +68,7 @@ export function useRealtimeData() {
           .from('priority_queue')
           .select(`
             *,
-            profiles (name, email)
+            profiles (name, email, gender)
           `)
           .order('position');
         
@@ -134,7 +135,7 @@ export function useRealtimeData() {
             .from('priority_queue')
             .select(`
               *,
-              profiles (name, email)
+              profiles (name, email, gender)
             `)
             .order('position')
             .then(({ data }) => {

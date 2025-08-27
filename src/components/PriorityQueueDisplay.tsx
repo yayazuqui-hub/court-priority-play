@@ -25,6 +25,40 @@ export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQue
 
     setLoading(true);
     try {
+      // Get user profile to check gender
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!profile?.gender) {
+        toast({
+          title: "Erro",
+          description: "Perfil incompleto. Entre em contato com o administrador.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Count current queue by gender
+      const maleCount = priorityQueue.filter(item => item.profiles.gender === 'masculino').length;
+      const femaleCount = priorityQueue.filter(item => item.profiles.gender === 'feminino').length;
+
+      // Check if queue is full for this gender
+      const isGenderQueueFull = profile.gender === 'masculino' ? maleCount >= 6 : femaleCount >= 6;
+
+      if (isGenderQueueFull) {
+        toast({
+          title: "Fila cheia",
+          description: `A fila para o time ${profile.gender} está cheia (6/6).`,
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
+
       // Find the next position in the queue
       const nextPosition = priorityQueue.length + 1;
 
@@ -103,34 +137,98 @@ export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQue
             Nenhum usuário na fila de prioridade
           </p>
         ) : (
-          <div className="space-y-2">
-            {priorityQueue.map((item, index) => (
-              <div
-                key={item.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  item.user_id === user?.id
-                    ? 'bg-primary/10 border-primary'
-                    : 'bg-card'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <Badge variant={index < 3 ? "default" : "secondary"}>
-                    #{item.position}
-                  </Badge>
-                  <div>
-                    <p className="font-medium">{item.profiles.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {item.profiles.email}
-                    </p>
-                  </div>
-                </div>
-                {item.user_id === user?.id && (
-                  <Badge className="bg-success text-success-foreground">
-                    Você
-                  </Badge>
+          <div className="space-y-4">
+            {/* Masculino */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-blue-600">Time Masculino</h4>
+                <Badge variant="outline" className="text-blue-600 border-blue-600">
+                  {priorityQueue.filter(item => item.profiles.gender === 'masculino').length}/6
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                {priorityQueue
+                  .filter(item => item.profiles.gender === 'masculino')
+                  .map((item, index) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${
+                        item.user_id === user?.id
+                          ? 'bg-primary/10 border-primary'
+                          : 'bg-card'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Badge variant={index < 3 ? "default" : "secondary"}>
+                          #{item.position}
+                        </Badge>
+                        <div>
+                          <p className="font-medium">{item.profiles.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.profiles.email}
+                          </p>
+                        </div>
+                      </div>
+                      {item.user_id === user?.id && (
+                        <Badge className="bg-success text-success-foreground">
+                          Você
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                {priorityQueue.filter(item => item.profiles.gender === 'masculino').length === 0 && (
+                  <p className="text-center text-muted-foreground py-2 text-sm">
+                    Nenhum usuário masculino na fila
+                  </p>
                 )}
               </div>
-            ))}
+            </div>
+
+            {/* Feminino */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-pink-600">Time Feminino</h4>
+                <Badge variant="outline" className="text-pink-600 border-pink-600">
+                  {priorityQueue.filter(item => item.profiles.gender === 'feminino').length}/6
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                {priorityQueue
+                  .filter(item => item.profiles.gender === 'feminino')
+                  .map((item, index) => (
+                    <div
+                      key={item.id}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${
+                        item.user_id === user?.id
+                          ? 'bg-primary/10 border-primary'
+                          : 'bg-card'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Badge variant={index < 3 ? "default" : "secondary"}>
+                          #{item.position}
+                        </Badge>
+                        <div>
+                          <p className="font-medium">{item.profiles.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.profiles.email}
+                          </p>
+                        </div>
+                      </div>
+                      {item.user_id === user?.id && (
+                        <Badge className="bg-success text-success-foreground">
+                          Você
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                {priorityQueue.filter(item => item.profiles.gender === 'feminino').length === 0 && (
+                  <p className="text-center text-muted-foreground py-2 text-sm">
+                    Nenhuma usuária feminina na fila
+                  </p>
+                )}
+              </div>
+            </div>
             
             {userPosition && (
               <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/20">

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
@@ -13,6 +15,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const [isSignUp, setIsSignUp] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [gender, setGender] = useState('masculino');
   const [loading, setLoading] = useState(false);
   
   const { signUp, signIn } = useAuth();
@@ -34,7 +37,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           return;
         }
 
-        const { error } = await signUp(name.trim(), email.trim());
+        const { error } = await signUp(name.trim(), email.trim(), gender);
         if (error) {
           if (error.message?.includes('already registered')) {
             toast({
@@ -108,15 +111,30 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div>
-              <Input
-                type="text"
-                placeholder="Seu nome completo"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Seu nome completo"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Time</Label>
+                <RadioGroup value={gender} onValueChange={setGender}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="masculino" id="masculino" />
+                    <Label htmlFor="masculino">Masculino</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="feminino" id="feminino" />
+                    <Label htmlFor="feminino">Feminino</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </>
           )}
           <div>
             <Input
