@@ -1,7 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { PriorityQueue } from '@/hooks/useRealtimeData';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 interface PriorityQueueDisplayProps {
   priorityQueue: PriorityQueue[];
@@ -9,8 +13,80 @@ interface PriorityQueueDisplayProps {
 
 export function PriorityQueueDisplay({ priorityQueue }: PriorityQueueDisplayProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   const userPosition = priorityQueue.find(item => item.user_id === user?.id)?.position;
+  const userInQueue = priorityQueue.find(item => item.user_id === user?.id);
+
+  const joinQueue = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      // Find the next position in the queue
+      const nextPosition = priorityQueue.length + 1;
+
+      const { error } = await supabase
+        .from('priority_queue')
+        .insert({
+          user_id: user.id,
+          position: nextPosition
+        });
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao entrar na fila de prioridade.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Sucesso! 🎉",
+          description: "Você entrou na fila de prioridade!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao entrar na fila.",
+        variant: "destructive"
+      });
+    }
+    setLoading(false);
+  };
+
+  const leaveQueue = async () => {
+    if (!user || !userInQueue) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('priority_queue')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao sair da fila de prioridade.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Sucesso",
+          description: "Você saiu da fila de prioridade.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao sair da fila.",
+        variant: "destructive"
+      });
+    }
+    setLoading(false);
+  };
 
   return (
     <Card>
@@ -70,6 +146,27 @@ export function PriorityQueueDisplay({ priorityQueue }: PriorityQueueDisplayProp
             )}
           </div>
         )}
+        
+        <div className="mt-4 flex justify-center">
+          {userInQueue ? (
+            <Button 
+              variant="outline" 
+              onClick={leaveQueue} 
+              disabled={loading}
+              size="sm"
+            >
+              {loading ? 'Saindo...' : 'Sair da Fila'}
+            </Button>
+          ) : (
+            <Button 
+              onClick={joinQueue} 
+              disabled={loading || priorityQueue.length >= 12}
+              size="sm"
+            >
+              {loading ? 'Entrando...' : 'Entrar na Fila'}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
