@@ -100,6 +100,80 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_users: {
+        Row: {
+          created_at: string
+          id: string
+          paid_at: string | null
+          payment_id: string
+          payment_method: string | null
+          payment_status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id: string
+          payment_method?: string | null
+          payment_status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id?: string
+          payment_method?: string | null
+          payment_status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_users_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          court_total_value: number
+          created_at: string
+          created_by: string
+          game_date: string
+          id: string
+          individual_value: number
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          court_total_value: number
+          created_at?: string
+          created_by: string
+          game_date: string
+          id?: string
+          individual_value: number
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          court_total_value?: number
+          created_at?: string
+          created_by?: string
+          game_date?: string
+          id?: string
+          individual_value?: number
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       priority_queue: {
         Row: {
           created_at: string

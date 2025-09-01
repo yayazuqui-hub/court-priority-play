@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminPanel } from '@/components/AdminPanel';
+import { PaymentForm } from '@/components/PaymentForm';
 import { BookingsList } from '@/components/BookingsList';
 import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
 import { TeamGenerator } from '@/components/TeamGenerator';
@@ -106,6 +107,8 @@ export default function Admin() {
             priorityQueue={priorityQueue}
             bookings={bookings}
           />
+          
+          <PaymentForm onPaymentCreated={() => window.location.reload()} />
           
           <TeamGenerator bookings={bookings} />
           

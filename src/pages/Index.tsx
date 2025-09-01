@@ -11,7 +11,7 @@ import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Settings, Calendar, User } from 'lucide-react';
+import { LogOut, Settings, Calendar, User, DollarSign } from 'lucide-react';
 import volleyballLogo from '@/assets/volleyball-logo.png';
 
 const Index = () => {
@@ -75,6 +75,13 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/payments')}
+            >
+              <DollarSign className="h-4 w-4 mr-2" />
+              Pagamentos
+            </Button>
             <Button
               variant="outline"
               onClick={() => navigate('/profile')}
