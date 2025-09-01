@@ -142,13 +142,7 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
   };
 
   const renderPlayer = (player: { name: string; level?: string }, teamIndex: number) => (
-    <div 
-      className={`flex flex-col items-center p-2 bg-white/90 rounded-lg border border-primary/20 min-h-[60px] justify-center ${
-        useGeneratedTeams && showTeamGenerator ? 'cursor-pointer hover:bg-primary/10 hover:scale-105 transition-all duration-200' : ''
-      }`}
-      onClick={() => useGeneratedTeams && showTeamGenerator && movePlayerBetweenTeams(player.name, teamIndex)}
-      title={useGeneratedTeams && showTeamGenerator ? `Clique para mover ${player.name} para o outro time` : player.name}
-    >
+    <div className="flex flex-col items-center p-2 bg-white/90 rounded-lg border border-primary/20 min-h-[60px] justify-center">
       <span className="text-xs font-semibold text-primary truncate max-w-[80px]">
         {player.name}
       </span>
@@ -158,6 +152,16 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
            player.level === 'intermediario' ? 'M' : 
            player.level === 'avancado' ? 'A' : '?'}
         </Badge>
+      )}
+      {useGeneratedTeams && showTeamGenerator && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => movePlayerBetweenTeams(player.name, teamIndex)}
+          className="text-xs h-6 px-2 mt-1"
+        >
+          Mover
+        </Button>
       )}
     </div>
   );
