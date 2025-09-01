@@ -89,10 +89,10 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
       playerName: booking.player1_name,
       team: booking.team || 'não informado',
       level: booking.player_level || 'não informado',
-      bookedBy: booking.profiles.name,
-      email: booking.profiles.email,
+      bookedBy: booking.profiles?.name || 'Administrador',
+      email: booking.profiles?.email || 'admin@sistema.com',
       createdAt: booking.created_at,
-      userId: booking.user_id,
+      userId: booking.user_id || '',
       isOptional: false
     });
     
@@ -104,10 +104,10 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
         playerName: booking.player2_name,
         team: booking.player2_team || 'não informado',
         level: booking.player2_level || 'não informado',
-        bookedBy: booking.profiles.name,
-        email: booking.profiles.email,
+        bookedBy: booking.profiles?.name || 'Administrador',
+        email: booking.profiles?.email || 'admin@sistema.com',
         createdAt: booking.created_at,
-        userId: booking.user_id,
+        userId: booking.user_id || '',
         isOptional: true
       });
     }
