@@ -22,14 +22,16 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
   const [player2Team, setPlayer2Team] = useState('masculino');
   const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Verificar se usuário já tem marcação ativa (só aplicar limitação se não estiver aberto para todos)
-  const userHasActiveBooking = !systemState?.is_open_for_all && bookings.some(booking => booking.user_id === user?.id);
+  // Verificar se usuário já tem marcação ativa
+  const userActiveBooking = bookings.find(booking => booking.user_id === user?.id);
+  const userHasActiveBooking = !!userActiveBooking;
 
-  // Buscar dados do perfil do usuário
+  // Buscar dados do perfil do usuário e preencher dados da marcação existente
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
@@ -49,6 +51,18 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
 
     fetchUserProfile();
   }, [user]);
+
+  // Preencher campos se já existe marcação ativa (modo aberto)
+  useEffect(() => {
+    if (systemState?.is_open_for_all && userActiveBooking) {
+      setPlayer2Name(userActiveBooking.player2_name || '');
+      setPlayer2Level(userActiveBooking.player2_level || 'iniciante');
+      setPlayer2Team(userActiveBooking.player2_team || 'masculino');
+      setIsEditing(true);
+    } else {
+      setIsEditing(false);
+    }
+  }, [systemState?.is_open_for_all, userActiveBooking]);
 
   const canMakeBooking = () => {
     if (!systemState || !user) return false;
@@ -109,32 +123,51 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user!.id,
-          player1_name: userProfile.name,
-          player2_name: player2Name.trim() || null,
-          player_level: userProfile.level,
-          team: userProfile.gender,
-          player2_team: player2Name.trim() ? player2Team : null,
-          player2_level: player2Name.trim() ? player2Level : null,
-        });
+      let error;
+      
+      // Se está editando uma marcação existente (modo aberto), atualizar ao invés de inserir
+      if (isEditing && userActiveBooking) {
+        const { error: updateError } = await supabase
+          .from('bookings')
+          .update({
+            player2_name: player2Name.trim() || null,
+            player2_team: player2Name.trim() ? player2Team : null,
+            player2_level: player2Name.trim() ? player2Level : null,
+          })
+          .eq('id', userActiveBooking.id);
+        error = updateError;
+      } else {
+        // Criar nova marcação
+        const { error: insertError } = await supabase
+          .from('bookings')
+          .insert({
+            user_id: user!.id,
+            player1_name: userProfile.name,
+            player2_name: player2Name.trim() || null,
+            player_level: userProfile.level,
+            team: userProfile.gender,
+            player2_team: player2Name.trim() ? player2Team : null,
+            player2_level: player2Name.trim() ? player2Level : null,
+          });
+        error = insertError;
+      }
 
       if (error) {
         toast({
           title: "Erro",
-          description: "Erro ao fazer a marcação. Tente novamente.",
+          description: `Erro ao ${isEditing ? 'atualizar' : 'fazer'} a marcação. Tente novamente.`,
           variant: "destructive"
         });
       } else {
         toast({
           title: "Sucesso! 🎉",
-          description: "Marcação realizada com sucesso!",
+          description: `Marcação ${isEditing ? 'atualizada' : 'realizada'} com sucesso!`,
         });
-        setPlayer2Name('');
-        setPlayer2Level('iniciante');
-        setPlayer2Team('masculino');
+        if (!isEditing) {
+          setPlayer2Name('');
+          setPlayer2Level('iniciante');
+          setPlayer2Team('masculino');
+        }
         onBookingSuccess();
       }
     } catch (error) {
@@ -148,7 +181,7 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
     setLoading(false);
   };
 
-  if (userHasActiveBooking) {
+  if (userHasActiveBooking && !systemState?.is_open_for_all) {
     return (
       <Card>
         <CardHeader>
@@ -160,10 +193,7 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
               ✅ Você já possui uma marcação ativa
             </p>
             <p className="text-sm text-muted-foreground">
-              {systemState?.is_open_for_all 
-                ? "No modo aberto, você pode fazer quantas marcações quiser." 
-                : "Aguarde o final da sessão atual para fazer uma nova marcação."
-              }
+              Aguarde o final da sessão atual para fazer uma nova marcação.
             </p>
           </div>
         </CardContent>
@@ -214,10 +244,10 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">
-          Fazer Marcação
+          {isEditing ? 'Editar Marcação' : 'Fazer Marcação'}
           {systemState?.is_open_for_all && (
             <span className="ml-2 text-sm font-normal text-green-600">
-              🌟 Modo Aberto - Múltiplas marcações permitidas
+              {isEditing ? '✏️ Editando parceiro' : '🌟 Modo Aberto'}
             </span>
           )}
         </CardTitle>
@@ -284,7 +314,10 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
           )}
           
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Fazendo marcação...' : 'Confirmar Marcação'}
+            {loading 
+              ? `${isEditing ? 'Atualizando' : 'Fazendo'} marcação...` 
+              : `${isEditing ? 'Atualizar' : 'Confirmar'} Marcação`
+            }
           </Button>
         </form>
       </CardContent>
