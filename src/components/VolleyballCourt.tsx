@@ -114,9 +114,42 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
     setUseGeneratedTeams(true);
   };
 
-  const renderPlayer = (player: { name: string; level?: string }, position: string = '') => (
-    <div className="flex flex-col items-center p-2 bg-white/90 rounded-lg border border-primary/20 min-h-[60px] justify-center">
-      <span className="text-xs font-semibold text-primary truncate max-w-[80px]" title={player.name}>
+  const movePlayerBetweenTeams = (playerName: string, fromTeam: number) => {
+    if (!useGeneratedTeams || generatedTeams.length < 2) return;
+
+    const updatedTeams = [...generatedTeams];
+    const toTeam = fromTeam === 0 ? 1 : 0;
+
+    // Find and remove player from source team
+    const playerIndex = updatedTeams[fromTeam].players.findIndex(p => p.name === playerName);
+    if (playerIndex === -1) return;
+
+    const [player] = updatedTeams[fromTeam].players.splice(playerIndex, 1);
+
+    // Add player to destination team (if there's space)
+    if (updatedTeams[toTeam].players.length < 6) {
+      updatedTeams[toTeam].players.push(player);
+    } else {
+      // If destination team is full, swap with the last player
+      const lastPlayer = updatedTeams[toTeam].players.pop();
+      updatedTeams[toTeam].players.push(player);
+      if (lastPlayer) {
+        updatedTeams[fromTeam].players.push(lastPlayer);
+      }
+    }
+
+    setGeneratedTeams(updatedTeams);
+  };
+
+  const renderPlayer = (player: { name: string; level?: string }, teamIndex: number) => (
+    <div 
+      className={`flex flex-col items-center p-2 bg-white/90 rounded-lg border border-primary/20 min-h-[60px] justify-center ${
+        useGeneratedTeams && showTeamGenerator ? 'cursor-pointer hover:bg-primary/10 hover:scale-105 transition-all duration-200' : ''
+      }`}
+      onClick={() => useGeneratedTeams && showTeamGenerator && movePlayerBetweenTeams(player.name, teamIndex)}
+      title={useGeneratedTeams && showTeamGenerator ? `Clique para mover ${player.name} para o outro time` : player.name}
+    >
+      <span className="text-xs font-semibold text-primary truncate max-w-[80px]">
         {player.name}
       </span>
       {player.level && player.level !== 'não informado' && (
@@ -234,15 +267,15 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Front row - positions 4, 3, 2 */}
-                  {teamAPlayers[0] ? renderPlayer(teamAPlayers[0]) : renderEmptyPosition()}
-                  {teamAPlayers[1] ? renderPlayer(teamAPlayers[1]) : renderEmptyPosition()}
-                  {teamAPlayers[2] ? renderPlayer(teamAPlayers[2]) : renderEmptyPosition()}
+                  {teamAPlayers[0] ? renderPlayer(teamAPlayers[0], 0) : renderEmptyPosition()}
+                  {teamAPlayers[1] ? renderPlayer(teamAPlayers[1], 0) : renderEmptyPosition()}
+                  {teamAPlayers[2] ? renderPlayer(teamAPlayers[2], 0) : renderEmptyPosition()}
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {/* Back row - positions 5, 6, 1 */}
-                  {teamAPlayers[3] ? renderPlayer(teamAPlayers[3]) : renderEmptyPosition()}
-                  {teamAPlayers[4] ? renderPlayer(teamAPlayers[4]) : renderEmptyPosition()}
-                  {teamAPlayers[5] ? renderPlayer(teamAPlayers[5]) : renderEmptyPosition()}
+                  {teamAPlayers[3] ? renderPlayer(teamAPlayers[3], 0) : renderEmptyPosition()}
+                  {teamAPlayers[4] ? renderPlayer(teamAPlayers[4], 0) : renderEmptyPosition()}
+                  {teamAPlayers[5] ? renderPlayer(teamAPlayers[5], 0) : renderEmptyPosition()}
                 </div>
               </div>
 
@@ -258,15 +291,15 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
               <div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Back row - positions 1, 6, 5 */}
-                  {teamBPlayers[0] ? renderPlayer(teamBPlayers[0]) : renderEmptyPosition()}
-                  {teamBPlayers[1] ? renderPlayer(teamBPlayers[1]) : renderEmptyPosition()}
-                  {teamBPlayers[2] ? renderPlayer(teamBPlayers[2]) : renderEmptyPosition()}
+                  {teamBPlayers[0] ? renderPlayer(teamBPlayers[0], 1) : renderEmptyPosition()}
+                  {teamBPlayers[1] ? renderPlayer(teamBPlayers[1], 1) : renderEmptyPosition()}
+                  {teamBPlayers[2] ? renderPlayer(teamBPlayers[2], 1) : renderEmptyPosition()}
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Front row - positions 2, 3, 4 */}
-                  {teamBPlayers[3] ? renderPlayer(teamBPlayers[3]) : renderEmptyPosition()}
-                  {teamBPlayers[4] ? renderPlayer(teamBPlayers[4]) : renderEmptyPosition()}
-                  {teamBPlayers[5] ? renderPlayer(teamBPlayers[5]) : renderEmptyPosition()}
+                  {teamBPlayers[3] ? renderPlayer(teamBPlayers[3], 1) : renderEmptyPosition()}
+                  {teamBPlayers[4] ? renderPlayer(teamBPlayers[4], 1) : renderEmptyPosition()}
+                  {teamBPlayers[5] ? renderPlayer(teamBPlayers[5], 1) : renderEmptyPosition()}
                 </div>
                 <div className="text-center mt-2">
                   <Badge className="bg-accent">
