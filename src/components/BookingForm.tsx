@@ -26,8 +26,8 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
   const { user } = useAuth();
   const { toast } = useToast();
 
-  // Verificar se usuário já tem marcação ativa
-  const userHasActiveBooking = bookings.some(booking => booking.user_id === user?.id);
+  // Verificar se usuário já tem marcação ativa (só aplicar limitação se não estiver aberto para todos)
+  const userHasActiveBooking = !systemState?.is_open_for_all && bookings.some(booking => booking.user_id === user?.id);
 
   // Buscar dados do perfil do usuário
   useEffect(() => {
@@ -87,7 +87,8 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
       return;
     }
 
-    if (userHasActiveBooking) {
+    // Só verificar marcação existente se não estiver aberto para todos
+    if (!systemState?.is_open_for_all && userHasActiveBooking) {
       toast({
         title: "Não permitido",
         description: "Você já possui uma marcação ativa.",
@@ -159,7 +160,10 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
               ✅ Você já possui uma marcação ativa
             </p>
             <p className="text-sm text-muted-foreground">
-              Aguarde o final da sessão atual para fazer uma nova marcação.
+              {systemState?.is_open_for_all 
+                ? "No modo aberto, você pode fazer quantas marcações quiser." 
+                : "Aguarde o final da sessão atual para fazer uma nova marcação."
+              }
             </p>
           </div>
         </CardContent>
@@ -209,7 +213,14 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Fazer Marcação</CardTitle>
+        <CardTitle className="text-lg">
+          Fazer Marcação
+          {systemState?.is_open_for_all && (
+            <span className="ml-2 text-sm font-normal text-green-600">
+              🌟 Modo Aberto - Múltiplas marcações permitidas
+            </span>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
