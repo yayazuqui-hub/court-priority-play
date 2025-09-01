@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,8 @@ interface BookingFormProps {
 export function BookingForm({ systemState, priorityQueue, onBookingSuccess }: BookingFormProps) {
   const [player1Name, setPlayer1Name] = useState('');
   const [player2Name, setPlayer2Name] = useState('');
+  const [playerLevel, setPlayerLevel] = useState('iniciante');
+  const [team, setTeam] = useState('masculino');
   const [loading, setLoading] = useState(false);
   
   const { user } = useAuth();
@@ -77,6 +80,8 @@ export function BookingForm({ systemState, priorityQueue, onBookingSuccess }: Bo
           user_id: user!.id,
           player1_name: player1Name.trim(),
           player2_name: player2Name.trim() || null,
+          player_level: playerLevel,
+          team: team,
         });
 
       if (error) {
@@ -92,6 +97,8 @@ export function BookingForm({ systemState, priorityQueue, onBookingSuccess }: Bo
         });
         setPlayer1Name('');
         setPlayer2Name('');
+        setPlayerLevel('iniciante');
+        setTeam('masculino');
         onBookingSuccess();
       }
     } catch (error) {
@@ -157,6 +164,38 @@ export function BookingForm({ systemState, priorityQueue, onBookingSuccess }: Bo
               value={player2Name}
               onChange={(e) => setPlayer2Name(e.target.value)}
             />
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Nível do Atleta</Label>
+            <RadioGroup value={playerLevel} onValueChange={setPlayerLevel}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="iniciante" id="level-iniciante" />
+                <Label htmlFor="level-iniciante">Iniciante</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="intermediario" id="level-intermediario" />
+                <Label htmlFor="level-intermediario">Intermediário</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="avancado" id="level-avancado" />
+                <Label htmlFor="level-avancado">Avançado</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Time</Label>
+            <RadioGroup value={team} onValueChange={setTeam}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="masculino" id="team-masculino" />
+                <Label htmlFor="team-masculino">Masculino</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="feminino" id="team-feminino" />
+                <Label htmlFor="team-feminino">Feminino</Label>
+              </div>
+            </RadioGroup>
           </div>
           
           <Button type="submit" className="w-full" disabled={loading}>

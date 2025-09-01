@@ -18,24 +18,30 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          player_level: string | null
           player1_name: string
           player2_name: string | null
+          team: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          player_level?: string | null
           player1_name: string
           player2_name?: string | null
+          team?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          player_level?: string | null
           player1_name?: string
           player2_name?: string | null
+          team?: string | null
           updated_at?: string
           user_id?: string
         }
