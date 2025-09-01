@@ -8,6 +8,7 @@ import { Shuffle, Users, Share2 } from 'lucide-react';
 interface TeamGeneratorProps {
   bookings: Booking[];
   onTeamsSaved?: (teams: GeneratedTeam[]) => void;
+  savedTeams?: GeneratedTeam[];
 }
 
 interface GeneratedTeam {
@@ -19,8 +20,8 @@ interface GeneratedTeam {
   }[];
 }
 
-export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
-  const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>([]);
+export function TeamGenerator({ bookings, onTeamsSaved, savedTeams = [] }: TeamGeneratorProps) {
+  const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>(savedTeams);
 
   // Extract all players from bookings
   const getAllPlayers = () => {
@@ -211,6 +212,7 @@ export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
 
   const totalPlayers = getAllPlayers().length;
   const canGenerate = totalPlayers >= 12;
+  const hasGeneratedTeams = generatedTeams.length > 0;
 
   return (
     <Card>
@@ -250,7 +252,7 @@ export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
           </div>
         )}
 
-        {generatedTeams.length > 0 && canGenerate && (
+        {hasGeneratedTeams && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Times Gerados</h3>

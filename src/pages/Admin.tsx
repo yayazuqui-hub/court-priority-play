@@ -118,7 +118,7 @@ export default function Admin() {
           
           <VolleyballCourt bookings={bookings} showTeamGenerator={true} savedTeams={savedTeams} />
           
-          <TeamGenerator bookings={bookings} onTeamsSaved={handleTeamsSaved} />
+          <TeamGenerator bookings={bookings} onTeamsSaved={handleTeamsSaved} savedTeams={savedTeams} />
           
           <Card className="border-primary/20 shadow-lg">
             <CardHeader className="volleyball-gradient text-white">
