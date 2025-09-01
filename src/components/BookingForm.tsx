@@ -116,6 +116,8 @@ export function BookingForm({ systemState, priorityQueue, bookings, onBookingSuc
           player2_name: player2Name.trim() || null,
           player_level: userProfile.level,
           team: userProfile.gender,
+          player2_team: player2Name.trim() ? player2Team : null,
+          player2_level: player2Name.trim() ? player2Level : null,
         });
 
       if (error) {

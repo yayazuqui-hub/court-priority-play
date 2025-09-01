@@ -35,8 +35,8 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
       if (booking.player2_name) {
         players.push({
           name: booking.player2_name,
-          level: booking.player_level || 'não informado',
-          gender: booking.team || 'não informado'
+          level: booking.player2_level || 'não informado',
+          gender: booking.player2_team || 'não informado'
         });
       }
     });

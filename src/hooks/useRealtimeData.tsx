@@ -27,6 +27,8 @@ export interface Booking {
   player2_name: string | null;
   player_level: string | null;
   team: string | null;
+  player2_team?: string | null;
+  player2_level?: string | null;
   created_at: string;
   profiles: {
     name: string;

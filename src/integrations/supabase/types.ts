@@ -20,7 +20,9 @@ export type Database = {
           id: string
           player_level: string | null
           player1_name: string
+          player2_level: string | null
           player2_name: string | null
+          player2_team: string | null
           team: string | null
           updated_at: string
           user_id: string
@@ -30,7 +32,9 @@ export type Database = {
           id?: string
           player_level?: string | null
           player1_name: string
+          player2_level?: string | null
           player2_name?: string | null
+          player2_team?: string | null
           team?: string | null
           updated_at?: string
           user_id: string
@@ -40,7 +44,9 @@ export type Database = {
           id?: string
           player_level?: string | null
           player1_name?: string
+          player2_level?: string | null
           player2_name?: string | null
+          player2_team?: string | null
           team?: string | null
           updated_at?: string
           user_id?: string
