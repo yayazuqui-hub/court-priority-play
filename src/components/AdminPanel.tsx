@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { SystemState, PriorityQueue, Booking } from '@/hooks/useRealtimeData';
 import { Settings, Users, Clock, Trash2, Play, Square } from 'lucide-react';
 import GamesScheduleForm from './GamesScheduleForm';
+import { ManualAddForm } from './ManualAddForm';
 
 interface AdminPanelProps {
   systemState: SystemState | null;
@@ -245,6 +246,8 @@ export function AdminPanel({ systemState, priorityQueue, bookings }: AdminPanelP
           </div>
         </CardContent>
       </Card>
+
+      <ManualAddForm priorityQueue={priorityQueue} />
 
       <GamesScheduleForm />
     </div>
