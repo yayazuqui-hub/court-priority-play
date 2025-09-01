@@ -144,10 +144,6 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
   const totalPlayers = getAllPlayers().length;
   const canGenerate = bookings.length >= 12;
 
-  if (!canGenerate) {
-    return null;
-  }
-
   return (
     <Card>
       <CardHeader>
@@ -157,20 +153,36 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
-          <div>
-            <p className="font-medium">12+ marcações ativas detectadas!</p>
-            <p className="text-sm text-muted-foreground">
-              Total de jogadores: {totalPlayers}
-            </p>
+        {!canGenerate ? (
+          <div className="p-4 bg-muted/50 rounded-lg border border-dashed">
+            <div className="text-center">
+              <p className="font-medium text-muted-foreground">
+                Aguardando marcações suficientes
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {bookings.length}/12 marcações ativas • {totalPlayers} jogadores
+              </p>
+              <p className="text-xs text-muted-foreground mt-2">
+                O gerador será habilitado com 12+ marcações
+              </p>
+            </div>
           </div>
-          <Button onClick={generateBalancedTeams} className="gap-2">
-            <Shuffle className="h-4 w-4" />
-            Gerar Times
-          </Button>
-        </div>
+        ) : (
+          <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
+            <div>
+              <p className="font-medium">12+ marcações ativas detectadas!</p>
+              <p className="text-sm text-muted-foreground">
+                Total de jogadores: {totalPlayers}
+              </p>
+            </div>
+            <Button onClick={generateBalancedTeams} className="gap-2">
+              <Shuffle className="h-4 w-4" />
+              Gerar Times
+            </Button>
+          </div>
+        )}
 
-        {generatedTeams.length > 0 && (
+        {generatedTeams.length > 0 && canGenerate && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Times Gerados</h3>
