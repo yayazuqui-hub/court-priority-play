@@ -113,8 +113,6 @@ export default function Admin() {
           
           <VolleyballCourt bookings={bookings} showTeamGenerator={true} />
           
-          <TeamGenerator bookings={bookings} />
-          
           <Card className="border-primary/20 shadow-lg">
             <CardHeader className="volleyball-gradient text-white">
               <CardTitle className="flex items-center gap-2 text-white">
