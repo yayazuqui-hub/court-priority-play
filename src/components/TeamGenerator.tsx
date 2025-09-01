@@ -130,10 +130,9 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
     let message = "🏐 *TIMES GERADOS*\n\n";
     
     generatedTeams.forEach((team) => {
-      message += `*Time ${team.id}* (${team.players.length} jogadores)\n`;
+      message += `*Time ${team.id}*\n`;
       team.players.forEach((player, index) => {
-        const emoji = getGenderEmoji(player.gender);
-        message += `${index + 1}. ${emoji} ${player.name} - ${player.level}\n`;
+        message += `${index + 1}. ${player.name}\n`;
       });
       message += "\n";
     });
