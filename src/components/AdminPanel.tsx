@@ -8,6 +8,7 @@ import { SystemState, PriorityQueue, Booking } from '@/hooks/useRealtimeData';
 import { Settings, Users, Clock, Trash2, Play, Square } from 'lucide-react';
 import GamesScheduleForm from './GamesScheduleForm';
 import { ManualAddForm } from './ManualAddForm';
+import { ManualBookingForm } from './ManualBookingForm';
 
 interface AdminPanelProps {
   systemState: SystemState | null;
@@ -248,6 +249,8 @@ export function AdminPanel({ systemState, priorityQueue, bookings }: AdminPanelP
       </Card>
 
       <ManualAddForm priorityQueue={priorityQueue} />
+
+      <ManualBookingForm bookings={bookings} />
 
       <GamesScheduleForm />
     </div>
