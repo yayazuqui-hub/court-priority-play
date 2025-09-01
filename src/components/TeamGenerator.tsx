@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,13 @@ interface GeneratedTeam {
 
 export function TeamGenerator({ bookings, onTeamsSaved, savedTeams = [] }: TeamGeneratorProps) {
   const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>(savedTeams);
+
+  // Sincroniza com times salvos (persistência)
+  useEffect(() => {
+    if (savedTeams && savedTeams.length) {
+      setGeneratedTeams(savedTeams);
+    }
+  }, [savedTeams]);
 
   // Extract all players from bookings
   const getAllPlayers = () => {

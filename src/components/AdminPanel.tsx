@@ -9,7 +9,7 @@ import { Settings, Users, Clock, Trash2, Play, Square } from 'lucide-react';
 import GamesScheduleForm from './GamesScheduleForm';
 import { ManualAddForm } from './ManualAddForm';
 import { ManualBookingForm } from './ManualBookingForm';
-import { TeamGenerator } from './TeamGenerator';
+
 
 interface AdminPanelProps {
   systemState: SystemState | null;
@@ -253,7 +253,7 @@ export function AdminPanel({ systemState, priorityQueue, bookings }: AdminPanelP
 
       <ManualBookingForm bookings={bookings} />
 
-      <TeamGenerator bookings={bookings} />
+      
 
       <GamesScheduleForm />
     </div>

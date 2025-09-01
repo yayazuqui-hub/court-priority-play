@@ -39,6 +39,16 @@ export default function Admin() {
     checkAdminStatus();
   }, [user]);
 
+  // Carrega times salvos do localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('savedTeams');
+      if (stored) {
+        setSavedTeams(JSON.parse(stored));
+      }
+    } catch {}
+  }, []);
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
@@ -46,6 +56,9 @@ export default function Admin() {
 
   const handleTeamsSaved = (teams: any[]) => {
     setSavedTeams(teams);
+    try {
+      localStorage.setItem('savedTeams', JSON.stringify(teams));
+    } catch {}
   };
 
   if (loading || isAdmin === null) {
