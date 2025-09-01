@@ -221,7 +221,7 @@ const Index = () => {
                   {bookings.length} marcações ativas
                 </Badge>
               </div>
-              <VolleyballCourt bookings={bookings} />
+              <VolleyballCourt bookings={bookings} showTeamGenerator={false} />
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

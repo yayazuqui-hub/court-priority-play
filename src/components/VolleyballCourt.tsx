@@ -1,5 +1,8 @@
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Shuffle, Users } from 'lucide-react';
 
 interface Booking {
   id: string;
@@ -11,23 +14,115 @@ interface Booking {
   player2_level?: string;
 }
 
-interface VolleyballCourtProps {
-  bookings: Booking[];
+interface GeneratedTeam {
+  id: number;
+  players: {
+    name: string;
+    level: string;
+    gender: string;
+  }[];
 }
 
-export function VolleyballCourt({ bookings }: VolleyballCourtProps) {
-  // Separate players by team
-  const teamA = bookings.filter(booking => booking.team === 'A');
-  const teamB = bookings.filter(booking => booking.team === 'B');
+interface VolleyballCourtProps {
+  bookings: Booking[];
+  showTeamGenerator?: boolean;
+}
 
-  const renderPlayer = (name: string, level?: string, position: string = '') => (
+export function VolleyballCourt({ bookings, showTeamGenerator = false }: VolleyballCourtProps) {
+  const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>([]);
+  const [useGeneratedTeams, setUseGeneratedTeams] = useState(false);
+
+  // Extract all players from bookings
+  const getAllPlayers = () => {
+    const players: { name: string; level: string; gender: string }[] = [];
+    
+    bookings.forEach((booking) => {
+      players.push({
+        name: booking.player1_name,
+        level: booking.player_level || 'não informado',
+        gender: booking.team || 'não informado'
+      });
+      
+      if (booking.player2_name) {
+        players.push({
+          name: booking.player2_name,
+          level: booking.player2_level || 'não informado',
+          gender: booking.player2_team || 'não informado'
+        });
+      }
+    });
+    
+    return players;
+  };
+
+  const generateBalancedTeams = () => {
+    const allPlayers = getAllPlayers();
+    
+    // Separate players by level and gender
+    const playersByLevel = {
+      iniciante: { masculino: [], feminino: [], 'não informado': [] },
+      intermediario: { masculino: [], feminino: [], 'não informado': [] },
+      avancado: { masculino: [], feminino: [], 'não informado': [] },
+      'não informado': { masculino: [], feminino: [], 'não informado': [] }
+    };
+
+    allPlayers.forEach(player => {
+      const level = player.level as keyof typeof playersByLevel;
+      const gender = player.gender as keyof typeof playersByLevel['iniciante'];
+      if (playersByLevel[level] && playersByLevel[level][gender]) {
+        playersByLevel[level][gender].push(player);
+      }
+    });
+
+    // Create two teams for court visualization
+    const teams: GeneratedTeam[] = [
+      { id: 1, players: [] },
+      { id: 2, players: [] }
+    ];
+
+    // Distribute players trying to balance levels and genders
+    const levels = ['avancado', 'intermediario', 'iniciante', 'não informado'];
+    const genders = ['masculino', 'feminino', 'não informado'];
+    
+    levels.forEach(level => {
+      genders.forEach(gender => {
+        const levelKey = level as keyof typeof playersByLevel;
+        const genderKey = gender as keyof typeof playersByLevel['iniciante'];
+        
+        if (playersByLevel[levelKey] && playersByLevel[levelKey][genderKey]) {
+          const players = [...playersByLevel[levelKey][genderKey]];
+          
+          // Shuffle players for randomness
+          for (let i = players.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [players[i], players[j]] = [players[j], players[i]];
+          }
+          
+          // Distribute players across teams (alternating)
+          players.forEach((player, index) => {
+            const teamIndex = index % 2;
+            if (teams[teamIndex].players.length < 6) {
+              teams[teamIndex].players.push(player);
+            }
+          });
+        }
+      });
+    });
+
+    setGeneratedTeams(teams);
+    setUseGeneratedTeams(true);
+  };
+
+  const renderPlayer = (player: { name: string; level?: string }, position: string = '') => (
     <div className="flex flex-col items-center p-2 bg-white/90 rounded-lg border border-primary/20 min-h-[60px] justify-center">
-      <span className="text-xs font-semibold text-primary truncate max-w-[80px]" title={name}>
-        {name}
+      <span className="text-xs font-semibold text-primary truncate max-w-[80px]" title={player.name}>
+        {player.name}
       </span>
-      {level && (
+      {player.level && player.level !== 'não informado' && (
         <Badge variant="outline" className="text-xs mt-1 px-1 py-0">
-          {level}
+          {player.level === 'iniciante' ? 'I' : 
+           player.level === 'intermediario' ? 'M' : 
+           player.level === 'avancado' ? 'A' : '?'}
         </Badge>
       )}
     </div>
@@ -39,27 +134,81 @@ export function VolleyballCourt({ bookings }: VolleyballCourtProps) {
     </div>
   );
 
-  // Get all players from team A
-  const teamAPlayers: Array<{name: string, level?: string}> = [];
-  teamA.forEach(booking => {
-    teamAPlayers.push({ name: booking.player1_name, level: booking.player_level });
-    if (booking.player2_name) {
-      teamAPlayers.push({ name: booking.player2_name, level: booking.player2_level });
-    }
-  });
+  // Determine which teams to display
+  let teamAPlayers: Array<{name: string, level?: string}> = [];
+  let teamBPlayers: Array<{name: string, level?: string}> = [];
 
-  // Get all players from team B
-  const teamBPlayers: Array<{name: string, level?: string}> = [];
-  teamB.forEach(booking => {
-    teamBPlayers.push({ name: booking.player1_name, level: booking.player_level });
-    if (booking.player2_name) {
-      teamBPlayers.push({ name: booking.player2_name, level: booking.player2_level });
-    }
-  });
+  if (useGeneratedTeams && generatedTeams.length >= 2) {
+    // Use generated balanced teams
+    teamAPlayers = generatedTeams[0].players.map(p => ({ name: p.name, level: p.level }));
+    teamBPlayers = generatedTeams[1].players.map(p => ({ name: p.name, level: p.level }));
+  } else {
+    // Use original team assignment from bookings
+    const teamA = bookings.filter(booking => booking.team === 'A');
+    const teamB = bookings.filter(booking => booking.team === 'B');
+
+    teamA.forEach(booking => {
+      teamAPlayers.push({ name: booking.player1_name, level: booking.player_level });
+      if (booking.player2_name) {
+        teamAPlayers.push({ name: booking.player2_name, level: booking.player2_level });
+      }
+    });
+
+    teamB.forEach(booking => {
+      teamBPlayers.push({ name: booking.player1_name, level: booking.player_level });
+      if (booking.player2_name) {
+        teamBPlayers.push({ name: booking.player2_name, level: booking.player2_level });
+      }
+    });
+  }
+
+  const totalPlayers = getAllPlayers().length;
+  const canGenerate = totalPlayers >= 12;
 
   return (
     <Card className="border-primary/20 shadow-lg">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Quadra Atual
+            {useGeneratedTeams && (
+              <Badge className="bg-success">Times Balanceados</Badge>
+            )}
+          </CardTitle>
+          {showTeamGenerator && canGenerate && (
+            <div className="flex gap-2">
+              {useGeneratedTeams && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setUseGeneratedTeams(false)}
+                >
+                  Ver Original
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={generateBalancedTeams}
+                className="gap-2"
+              >
+                <Shuffle className="h-4 w-4" />
+                {useGeneratedTeams ? 'Regenerar' : 'Balancear Times'}
+              </Button>
+            </div>
+          )}
+        </div>
+      </CardHeader>
       <CardContent className="p-6">
+        {!canGenerate && showTeamGenerator && (
+          <div className="mb-4 p-3 bg-muted/50 rounded-lg border border-dashed text-center">
+            <p className="text-sm text-muted-foreground">
+              {totalPlayers}/12 jogadores • Gerador de times será habilitado com 12+ jogadores
+            </p>
+          </div>
+        )}
+
         <div className="relative">
           {/* Court Background */}
           <div className="volleyball-gradient rounded-lg p-1">
@@ -68,19 +217,21 @@ export function VolleyballCourt({ bookings }: VolleyballCourtProps) {
               {/* Team A Side */}
               <div className="mb-4">
                 <div className="text-center mb-2">
-                  <Badge className="bg-primary">Time A</Badge>
+                  <Badge className="bg-primary">
+                    {useGeneratedTeams ? 'Time 1' : 'Time A'}
+                  </Badge>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Front row - positions 4, 3, 2 */}
-                  {teamAPlayers[0] ? renderPlayer(teamAPlayers[0].name, teamAPlayers[0].level) : renderEmptyPosition()}
-                  {teamAPlayers[1] ? renderPlayer(teamAPlayers[1].name, teamAPlayers[1].level) : renderEmptyPosition()}
-                  {teamAPlayers[2] ? renderPlayer(teamAPlayers[2].name, teamAPlayers[2].level) : renderEmptyPosition()}
+                  {teamAPlayers[0] ? renderPlayer(teamAPlayers[0]) : renderEmptyPosition()}
+                  {teamAPlayers[1] ? renderPlayer(teamAPlayers[1]) : renderEmptyPosition()}
+                  {teamAPlayers[2] ? renderPlayer(teamAPlayers[2]) : renderEmptyPosition()}
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {/* Back row - positions 5, 6, 1 */}
-                  {teamAPlayers[3] ? renderPlayer(teamAPlayers[3].name, teamAPlayers[3].level) : renderEmptyPosition()}
-                  {teamAPlayers[4] ? renderPlayer(teamAPlayers[4].name, teamAPlayers[4].level) : renderEmptyPosition()}
-                  {teamAPlayers[5] ? renderPlayer(teamAPlayers[5].name, teamAPlayers[5].level) : renderEmptyPosition()}
+                  {teamAPlayers[3] ? renderPlayer(teamAPlayers[3]) : renderEmptyPosition()}
+                  {teamAPlayers[4] ? renderPlayer(teamAPlayers[4]) : renderEmptyPosition()}
+                  {teamAPlayers[5] ? renderPlayer(teamAPlayers[5]) : renderEmptyPosition()}
                 </div>
               </div>
 
@@ -96,18 +247,20 @@ export function VolleyballCourt({ bookings }: VolleyballCourtProps) {
               <div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Back row - positions 1, 6, 5 */}
-                  {teamBPlayers[0] ? renderPlayer(teamBPlayers[0].name, teamBPlayers[0].level) : renderEmptyPosition()}
-                  {teamBPlayers[1] ? renderPlayer(teamBPlayers[1].name, teamBPlayers[1].level) : renderEmptyPosition()}
-                  {teamBPlayers[2] ? renderPlayer(teamBPlayers[2].name, teamBPlayers[2].level) : renderEmptyPosition()}
+                  {teamBPlayers[0] ? renderPlayer(teamBPlayers[0]) : renderEmptyPosition()}
+                  {teamBPlayers[1] ? renderPlayer(teamBPlayers[1]) : renderEmptyPosition()}
+                  {teamBPlayers[2] ? renderPlayer(teamBPlayers[2]) : renderEmptyPosition()}
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {/* Front row - positions 2, 3, 4 */}
-                  {teamBPlayers[3] ? renderPlayer(teamBPlayers[3].name, teamBPlayers[3].level) : renderEmptyPosition()}
-                  {teamBPlayers[4] ? renderPlayer(teamBPlayers[4].name, teamBPlayers[4].level) : renderEmptyPosition()}
-                  {teamBPlayers[5] ? renderPlayer(teamBPlayers[5].name, teamBPlayers[5].level) : renderEmptyPosition()}
+                  {teamBPlayers[3] ? renderPlayer(teamBPlayers[3]) : renderEmptyPosition()}
+                  {teamBPlayers[4] ? renderPlayer(teamBPlayers[4]) : renderEmptyPosition()}
+                  {teamBPlayers[5] ? renderPlayer(teamBPlayers[5]) : renderEmptyPosition()}
                 </div>
                 <div className="text-center mt-2">
-                  <Badge className="bg-accent">Time B</Badge>
+                  <Badge className="bg-accent">
+                    {useGeneratedTeams ? 'Time 2' : 'Time B'}
+                  </Badge>
                 </div>
               </div>
 
@@ -116,8 +269,8 @@ export function VolleyballCourt({ bookings }: VolleyballCourtProps) {
 
           {/* Stats */}
           <div className="mt-4 flex justify-between text-sm text-muted-foreground">
-            <span>Time A: {teamAPlayers.length}/6 jogadores</span>
-            <span>Time B: {teamBPlayers.length}/6 jogadores</span>
+            <span>{useGeneratedTeams ? 'Time 1' : 'Time A'}: {teamAPlayers.length}/6 jogadores</span>
+            <span>{useGeneratedTeams ? 'Time 2' : 'Time B'}: {teamBPlayers.length}/6 jogadores</span>
           </div>
         </div>
       </CardContent>

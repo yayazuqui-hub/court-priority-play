@@ -7,6 +7,7 @@ import { PaymentForm } from '@/components/PaymentForm';
 import { BookingsList } from '@/components/BookingsList';
 import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
 import { TeamGenerator } from '@/components/TeamGenerator';
+import { VolleyballCourt } from '@/components/VolleyballCourt';
 import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
@@ -109,6 +110,8 @@ export default function Admin() {
           />
           
           <PaymentForm onPaymentCreated={() => window.location.reload()} />
+          
+          <VolleyballCourt bookings={bookings} showTeamGenerator={true} />
           
           <TeamGenerator bookings={bookings} />
           
