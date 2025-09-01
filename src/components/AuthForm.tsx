@@ -16,6 +16,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('masculino');
+  const [level, setLevel] = useState('iniciante');
   const [loading, setLoading] = useState(false);
   
   const { signUp, signIn } = useAuth();
@@ -37,7 +38,7 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           return;
         }
 
-        const { error } = await signUp(name.trim(), email.trim(), gender);
+        const { error } = await signUp(name.trim(), email.trim(), gender, level);
         if (error) {
           if (error.message?.includes('already registered')) {
             toast({
@@ -131,6 +132,24 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="feminino" id="feminino" />
                     <Label htmlFor="feminino">Feminino</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Nível</Label>
+                <RadioGroup value={level} onValueChange={setLevel}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="iniciante" id="iniciante" />
+                    <Label htmlFor="iniciante">Iniciante</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="intermediario" id="intermediario" />
+                    <Label htmlFor="intermediario">Intermediário</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="avancado" id="avancado" />
+                    <Label htmlFor="avancado">Avançado</Label>
                   </div>
                 </RadioGroup>
               </div>
