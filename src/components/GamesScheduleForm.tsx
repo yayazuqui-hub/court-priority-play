@@ -18,6 +18,7 @@ const GamesScheduleForm = () => {
   const [address, setAddress] = useState("");
   const [gameDate, setGameDate] = useState<Date>();
   const [gameTime, setGameTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -47,6 +48,7 @@ const GamesScheduleForm = () => {
           address: address || null,
           game_date: format(gameDate, "yyyy-MM-dd"),
           game_time: gameTime,
+          end_time: endTime || null,
           created_by: user.id
         });
 
@@ -63,6 +65,7 @@ const GamesScheduleForm = () => {
       setAddress("");
       setGameDate(undefined);
       setGameTime("");
+      setEndTime("");
     } catch (error) {
       console.error("Error creating game schedule:", error);
       toast({
@@ -138,7 +141,11 @@ const GamesScheduleForm = () => {
                     mode="single"
                     selected={gameDate}
                     onSelect={setGameDate}
-                    disabled={(date) => date < new Date()}
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
                     initialFocus
                     className="p-3 pointer-events-auto"
                   />
@@ -147,7 +154,7 @@ const GamesScheduleForm = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="time">Horário *</Label>
+              <Label htmlFor="time">Horário de Início *</Label>
               <Input
                 id="time"
                 type="time"
@@ -156,6 +163,17 @@ const GamesScheduleForm = () => {
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="endTime">Horário de Término</Label>
+            <Input
+              id="endTime"
+              type="time"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              placeholder="Opcional"
+            />
           </div>
 
           <Button type="submit" disabled={isLoading} className="w-full">

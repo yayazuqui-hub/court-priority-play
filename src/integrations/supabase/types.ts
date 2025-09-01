@@ -66,6 +66,7 @@ export type Database = {
           address: string | null
           created_at: string
           created_by: string
+          end_time: string | null
           game_date: string
           game_time: string
           id: string
@@ -77,6 +78,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           created_by: string
+          end_time?: string | null
           game_date: string
           game_time: string
           id?: string
@@ -88,6 +90,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           created_by?: string
+          end_time?: string | null
           game_date?: string
           game_time?: string
           id?: string

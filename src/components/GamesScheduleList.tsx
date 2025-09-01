@@ -17,6 +17,7 @@ interface GameSchedule {
   address?: string;
   game_date: string;
   game_time: string;
+  end_time?: string;
   created_by: string;
   created_at: string;
 }
@@ -138,7 +139,10 @@ const GamesScheduleList = ({ games, isAdmin = false }: GamesScheduleListProps) =
               
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{game.game_time}</span>
+                <span>
+                  {game.game_time}
+                  {game.end_time && ` - ${game.end_time}`}
+                </span>
               </div>
               
               <div className="flex items-start gap-2 text-sm">
