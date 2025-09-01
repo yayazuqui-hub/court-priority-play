@@ -8,38 +8,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 35 20% 98%;
-    --foreground: 120 15% 15%;
+    /* Volleyball-inspired color palette */
+    --background: 210 40% 98%;
+    --foreground: 210 40% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 120 15% 15%;
+    --card-foreground: 210 40% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 120 15% 15%;
+    --popover-foreground: 210 40% 12%;
 
-    --primary: 120 60% 30%;
+    /* Primary: Volleyball blue */
+    --primary: 210 100% 45%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 120 20% 95%;
-    --secondary-foreground: 120 40% 20%;
+    /* Secondary: Court orange */
+    --secondary: 25 95% 92%;
+    --secondary-foreground: 25 95% 25%;
 
-    --muted: 120 15% 95%;
-    --muted-foreground: 120 10% 45%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 210 15% 45%;
 
-    --accent: 60 80% 50%;
-    --accent-foreground: 120 15% 15%;
+    /* Accent: Vibrant volleyball orange */
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 120 20% 90%;
-    --input: 120 20% 90%;
-    --ring: 120 60% 30%;
+    --border: 210 40% 88%;
+    --input: 210 40% 88%;
+    --ring: 210 100% 45%;
 
-    --success: 120 60% 40%;
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
 
-    --warning: 35 85% 55%;
+    --warning: 35 91% 62%;
     --warning-foreground: 0 0% 98%;
 
     --radius: 0.5rem;
@@ -62,39 +66,43 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 120 15% 8%;
-    --foreground: 120 20% 95%;
+    /* Dark mode volleyball theme */
+    --background: 210 50% 8%;
+    --foreground: 210 40% 95%;
 
-    --card: 120 15% 10%;
-    --card-foreground: 120 20% 95%;
+    --card: 210 50% 10%;
+    --card-foreground: 210 40% 95%;
 
-    --popover: 120 15% 10%;
-    --popover-foreground: 120 20% 95%;
+    --popover: 210 50% 10%;
+    --popover-foreground: 210 40% 95%;
 
-    --primary: 120 60% 50%;
-    --primary-foreground: 120 15% 8%;
+    /* Primary: Bright volleyball blue */
+    --primary: 210 100% 65%;
+    --primary-foreground: 210 50% 8%;
 
-    --secondary: 120 15% 15%;
-    --secondary-foreground: 120 20% 95%;
+    /* Secondary: Dark court */
+    --secondary: 210 50% 15%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 120 15% 15%;
-    --muted-foreground: 120 15% 65%;
+    --muted: 210 50% 15%;
+    --muted-foreground: 210 20% 65%;
 
-    --accent: 60 80% 60%;
-    --accent-foreground: 120 15% 8%;
+    /* Accent: Vibrant orange */
+    --accent: 25 95% 65%;
+    --accent-foreground: 210 50% 8%;
 
     --destructive: 0 62% 50%;
-    --destructive-foreground: 120 20% 95%;
+    --destructive-foreground: 210 40% 95%;
 
-    --border: 120 15% 20%;
-    --input: 120 15% 20%;
-    --ring: 120 60% 50%;
+    --border: 210 50% 20%;
+    --input: 210 50% 20%;
+    --ring: 210 100% 65%;
 
-    --success: 120 60% 50%;
-    --success-foreground: 120 15% 8%;
+    --success: 142 70% 45%;
+    --success-foreground: 210 50% 8%;
 
-    --warning: 35 85% 65%;
-    --warning-foreground: 120 15% 8%;
+    --warning: 35 91% 70%;
+    --warning-foreground: 210 50% 8%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -113,5 +121,44 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--accent) / 0.03) 0%, transparent 50%);
+  }
+
+  /* Volleyball-themed gradients */
+  .volleyball-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+
+  .court-gradient {
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+  }
+
+  /* Animation for volleyball bounce effect */
+  @keyframes volleyball-bounce {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .volleyball-bounce {
+    animation: volleyball-bounce 2s ease-in-out infinite;
+  }
+
+  /* Court lines effect */
+  .court-lines {
+    position: relative;
+  }
+
+  .court-lines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(180deg, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.1;
+    pointer-events: none;
   }
 }

@@ -10,7 +10,8 @@ import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, ArrowLeft, Calendar } from 'lucide-react';
+import { LogOut, ArrowLeft, Calendar, Shield } from 'lucide-react';
+import volleyballLogo from '@/assets/volleyball-logo.png';
 
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -66,18 +67,32 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background court-lines">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
               onClick={() => navigate('/')}
+              className="border-primary hover:bg-primary hover:text-primary-foreground"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar
             </Button>
-            <h1 className="text-3xl font-bold">Painel Administrativo</h1>
+            <img 
+              src={volleyballLogo} 
+              alt="Volleyball" 
+              className="w-10 h-10 volleyball-bounce"
+            />
+            <div>
+              <h1 className="text-3xl font-bold volleyball-gradient bg-clip-text text-transparent">
+                Painel Administrativo
+              </h1>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Shield className="w-4 h-4" />
+                <span>Área Restrita</span>
+              </div>
+            </div>
           </div>
           <Button variant="outline" onClick={handleSignOut}>
             <LogOut className="h-4 w-4 mr-2" />
@@ -94,14 +109,14 @@ export default function Admin() {
           
           <TeamGenerator bookings={bookings} />
           
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+          <Card className="border-primary/20 shadow-lg">
+            <CardHeader className="volleyball-gradient text-white">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <Calendar className="h-5 w-5" />
                 Agenda de Jogos
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <GamesScheduleList games={gamesSchedule} isAdmin={true} />
             </CardContent>
           </Card>

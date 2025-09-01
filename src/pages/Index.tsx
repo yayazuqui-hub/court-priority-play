@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Settings, Calendar, User } from 'lucide-react';
+import volleyballLogo from '@/assets/volleyball-logo.png';
 
 const Index = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -57,10 +58,22 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background court-lines">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-primary">🏐 Quadra de Vôlei</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <img 
+              src={volleyballLogo} 
+              alt="Volleyball" 
+              className="w-12 h-12 volleyball-bounce"
+            />
+            <div>
+              <h1 className="text-4xl font-bold volleyball-gradient bg-clip-text text-transparent">
+                Quadra de Vôlei
+              </h1>
+              <p className="text-muted-foreground text-sm">Sistema de Reservas</p>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
@@ -91,16 +104,20 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <PriorityTimer systemState={systemState} />
+            <div className="volleyball-gradient rounded-lg p-1">
+              <div className="bg-background rounded-lg">
+                <PriorityTimer systemState={systemState} />
+              </div>
+            </div>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <Card className="border-primary/20 shadow-lg">
+              <CardHeader className="volleyball-gradient text-white">
+                <CardTitle className="flex items-center gap-2 text-white">
                   <Calendar className="h-5 w-5" />
                   Agenda de Jogos
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <GamesScheduleList games={gamesSchedule} />
               </CardContent>
             </Card>
