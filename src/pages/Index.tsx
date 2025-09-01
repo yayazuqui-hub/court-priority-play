@@ -23,6 +23,14 @@ const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const { systemState, priorityQueue, bookings, gamesSchedule, loading: dataLoading } = useRealtimeData();
   const navigate = useNavigate();
+  const [savedTeams, setSavedTeams] = useState<any[]>(() => {
+    try {
+      const stored = localStorage.getItem('savedTeams');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     const checkAdminStatus = async () => {
@@ -40,6 +48,19 @@ const Index = () => {
 
     checkAdminStatus();
   }, [user]);
+
+  // Atualiza quando times salvos mudarem em outras abas
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'savedTeams') {
+        try {
+          setSavedTeams(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -221,7 +242,7 @@ const Index = () => {
                   {bookings.length} marcações ativas
                 </Badge>
               </div>
-              <VolleyballCourt bookings={bookings} showTeamGenerator={false} />
+              <VolleyballCourt bookings={bookings} showTeamGenerator={false} savedTeams={savedTeams} />
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
