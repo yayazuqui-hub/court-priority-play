@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Booking } from '@/hooks/useRealtimeData';
-import { Shuffle, Users } from 'lucide-react';
+import { Shuffle, Users, Share2 } from 'lucide-react';
 
 interface TeamGeneratorProps {
   bookings: Booking[];
@@ -124,6 +124,29 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
     setGeneratedTeams(teams);
   };
 
+  const exportToWhatsApp = () => {
+    if (generatedTeams.length === 0) return;
+
+    let message = "🏐 *TIMES GERADOS*\n\n";
+    
+    generatedTeams.forEach((team) => {
+      message += `*Time ${team.id}* (${team.players.length} jogadores)\n`;
+      team.players.forEach((player, index) => {
+        const emoji = getGenderEmoji(player.gender);
+        message += `${index + 1}. ${emoji} ${player.name} - ${player.level}\n`;
+      });
+      message += "\n";
+    });
+
+    message += `📊 *Total de jogadores:* ${getAllPlayers().length}\n`;
+    message += `🎲 Times gerados automaticamente`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+  };
+
   const getLevelBadgeVariant = (level: string) => {
     switch (level) {
       case 'iniciante': return 'default';
@@ -186,15 +209,26 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Times Gerados</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={generateBalancedTeams}
-                className="gap-2"
-              >
-                <Shuffle className="h-4 w-4" />
-                Regenerar
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exportToWhatsApp}
+                  className="gap-2"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Exportar WhatsApp
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={generateBalancedTeams}
+                  className="gap-2"
+                >
+                  <Shuffle className="h-4 w-4" />
+                  Regenerar
+                </Button>
+              </div>
             </div>
             
             <div className="grid gap-4 md:grid-cols-2">
