@@ -116,7 +116,7 @@ export default function Admin() {
           
           <PaymentForm onPaymentCreated={() => window.location.reload()} />
           
-          <VolleyballCourt bookings={bookings} showTeamGenerator={true} savedTeams={savedTeams} />
+          <VolleyballCourt bookings={bookings} showTeamGenerator={false} savedTeams={savedTeams} />
           
           <TeamGenerator bookings={bookings} onTeamsSaved={handleTeamsSaved} savedTeams={savedTeams} />
           
