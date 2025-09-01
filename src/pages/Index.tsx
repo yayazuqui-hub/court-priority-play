@@ -11,7 +11,7 @@ import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Settings, Calendar } from 'lucide-react';
+import { LogOut, Settings, Calendar, User } from 'lucide-react';
 
 const Index = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -62,6 +62,13 @@ const Index = () => {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-primary">🏐 Quadra de Vôlei</h1>
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/profile')}
+            >
+              <User className="h-4 w-4 mr-2" />
+              Perfil
+            </Button>
             {isAdmin && (
               <Button
                 variant="outline"
