@@ -5,10 +5,12 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserProgressCard } from '@/components/UserProgressCard';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, Save } from 'lucide-react';
+import { ArrowLeft, User, Save, Trophy } from 'lucide-react';
+import volleyballLogo from '@/assets/volleyball-logo.png';
 
 interface UserProfile {
   name: string;
@@ -120,94 +122,113 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-2xl">
-        <div className="flex items-center gap-4 mb-6">
+    <div className="min-h-screen bg-background court-lines">
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="flex items-center gap-4 mb-8">
           <Button
             variant="outline"
             onClick={() => navigate('/')}
+            className="border-primary hover:bg-primary hover:text-primary-foreground"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar
           </Button>
-          <h1 className="text-3xl font-bold text-primary flex items-center gap-2">
-            <User className="h-8 w-8" />
-            Meu Perfil
-          </h1>
+          <img 
+            src={volleyballLogo} 
+            alt="Volleyball" 
+            className="w-10 h-10 volleyball-bounce"
+          />
+          <div>
+            <h1 className="text-3xl font-bold volleyball-gradient bg-clip-text text-transparent">
+              Meu Perfil
+            </h1>
+            <p className="text-muted-foreground text-sm">Gerencie suas informações e progresso</p>
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Pessoais</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
-              <Input
-                id="name"
-                value={profileData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
-                placeholder="Seu nome completo"
-              />
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Profile Information */}
+          <Card className="border-primary/20 shadow-lg">
+            <CardHeader className="volleyball-gradient text-white">
+              <CardTitle className="flex items-center gap-2 text-white">
+                <User className="h-5 w-5" />
+                Informações Pessoais
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 p-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Nome</Label>
+                <Input
+                  id="name"
+                  value={profileData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  placeholder="Seu nome completo"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={profileData.email}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="seu@email.com"
-              />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={profileData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="seu@email.com"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="gender">Time</Label>
-              <Select
-                value={profileData.gender}
-                onValueChange={(value) => handleInputChange('gender', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione seu time" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="masculino">Masculino</SelectItem>
-                  <SelectItem value="feminino">Feminino</SelectItem>
-                  <SelectItem value="misto">Misto</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="gender">Time</Label>
+                <Select
+                  value={profileData.gender}
+                  onValueChange={(value) => handleInputChange('gender', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione seu time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="masculino">Masculino</SelectItem>
+                    <SelectItem value="feminino">Feminino</SelectItem>
+                    <SelectItem value="misto">Misto</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="level">Nível</Label>
-              <Select
-                value={profileData.level}
-                onValueChange={(value) => handleInputChange('level', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione seu nível" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="iniciante">Iniciante</SelectItem>
-                  <SelectItem value="intermediario">Intermediário</SelectItem>
-                  <SelectItem value="avancado">Avançado</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="level">Nível</Label>
+                <Select
+                  value={profileData.level}
+                  onValueChange={(value) => handleInputChange('level', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione seu nível" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="iniciante">Iniciante</SelectItem>
+                    <SelectItem value="intermediario">Intermediário</SelectItem>
+                    <SelectItem value="avancado">Avançado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="pt-4">
-              <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="w-full"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="pt-4">
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* User Progress */}
+          <div className="space-y-6">
+            <UserProgressCard />
+          </div>
+        </div>
       </div>
     </div>
   );

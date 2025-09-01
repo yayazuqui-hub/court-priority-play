@@ -295,6 +295,36 @@ export type Database = {
           },
         ]
       }
+      user_stats: {
+        Row: {
+          created_at: string
+          id: string
+          month: number
+          updated_at: string
+          user_id: string
+          victories: number | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month: number
+          updated_at?: string
+          user_id: string
+          victories?: number | null
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month?: number
+          updated_at?: string
+          user_id?: string
+          victories?: number | null
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
