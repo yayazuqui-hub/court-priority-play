@@ -123,6 +123,10 @@ export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
     });
 
     setGeneratedTeams(teams);
+    // Atualiza automaticamente a quadra atual
+    if (onTeamsSaved) {
+      onTeamsSaved(teams);
+    }
   };
 
   const movePlayerBetweenTeams = (playerName: string, fromTeamId: number) => {
@@ -154,6 +158,10 @@ export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
     }
 
     setGeneratedTeams(updatedTeams);
+    // Atualiza automaticamente a quadra atual após mover jogador
+    if (onTeamsSaved) {
+      onTeamsSaved(updatedTeams);
+    }
   };
 
   const saveTeams = () => {
