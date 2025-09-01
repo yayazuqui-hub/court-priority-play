@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { AdminPanel } from '@/components/AdminPanel';
 import { BookingsList } from '@/components/BookingsList';
 import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
+import { TeamGenerator } from '@/components/TeamGenerator';
 import GamesScheduleList from '@/components/GamesScheduleList';
 import { useAuth } from '@/hooks/useAuth';
 import { useRealtimeData } from '@/hooks/useRealtimeData';
@@ -90,6 +91,8 @@ export default function Admin() {
             priorityQueue={priorityQueue}
             bookings={bookings}
           />
+          
+          <TeamGenerator bookings={bookings} />
           
           <Card>
             <CardHeader>
