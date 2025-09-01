@@ -32,6 +32,7 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
   const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>([]);
   const [useGeneratedTeams, setUseGeneratedTeams] = useState(false);
 
+
   // Extract all players from bookings
   const getAllPlayers = () => {
     const players: { name: string; level: string; gender: string }[] = [];
@@ -143,21 +144,31 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
     teamAPlayers = generatedTeams[0].players.map(p => ({ name: p.name, level: p.level }));
     teamBPlayers = generatedTeams[1].players.map(p => ({ name: p.name, level: p.level }));
   } else {
-    // Use original team assignment from bookings
-    const teamA = bookings.filter(booking => booking.team === 'A');
-    const teamB = bookings.filter(booking => booking.team === 'B');
-
-    teamA.forEach(booking => {
-      teamAPlayers.push({ name: booking.player1_name, level: booking.player_level });
+    // Use original team assignment from bookings - but distribute players evenly
+    // Since the bookings use "masculino/feminino" instead of "A/B", we'll distribute players
+    const allBookingPlayers: Array<{name: string, level?: string}> = [];
+    
+    bookings.forEach(booking => {
+      allBookingPlayers.push({ name: booking.player1_name, level: booking.player_level });
       if (booking.player2_name) {
-        teamAPlayers.push({ name: booking.player2_name, level: booking.player2_level });
+        allBookingPlayers.push({ name: booking.player2_name, level: booking.player2_level });
       }
     });
 
-    teamB.forEach(booking => {
-      teamBPlayers.push({ name: booking.player1_name, level: booking.player_level });
-      if (booking.player2_name) {
-        teamBPlayers.push({ name: booking.player2_name, level: booking.player2_level });
+    // Distribute players evenly between teams
+    allBookingPlayers.forEach((player, index) => {
+      if (index % 2 === 0) {
+        if (teamAPlayers.length < 6) {
+          teamAPlayers.push(player);
+        } else if (teamBPlayers.length < 6) {
+          teamBPlayers.push(player);
+        }
+      } else {
+        if (teamBPlayers.length < 6) {
+          teamBPlayers.push(player);
+        } else if (teamAPlayers.length < 6) {
+          teamAPlayers.push(player);
+        }
       }
     });
   }
