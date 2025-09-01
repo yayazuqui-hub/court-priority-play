@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { AuthForm } from '@/components/AuthForm';
 import { PriorityTimer } from '@/components/PriorityTimer';
 import { PriorityQueueDisplay } from '@/components/PriorityQueueDisplay';
@@ -14,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Settings, Calendar, User, DollarSign, Menu, X, Trophy } from 'lucide-react';
 import volleyballLogo from '@/assets/volleyball-logo.png';
 import { UserProgressSummary } from '@/components/UserProgressSummary';
+import { VolleyballCourt } from '@/components/VolleyballCourt';
 
 const Index = () => {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -185,7 +187,7 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
               <Card className="border-primary/20 shadow-lg">
                 <CardHeader className="volleyball-gradient text-white">
                   <CardTitle className="flex items-center gap-2 text-white">
@@ -209,6 +211,17 @@ const Index = () => {
                   <UserProgressSummary />
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Volleyball Court Visual */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-xl font-semibold">Quadra Atual</h2>
+                <Badge variant="outline" className="text-xs">
+                  {bookings.length} marcações ativas
+                </Badge>
+              </div>
+              <VolleyballCourt bookings={bookings} />
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
