@@ -104,6 +104,7 @@ const Index = () => {
                 <BookingForm
                   systemState={systemState}
                   priorityQueue={priorityQueue}
+                  bookings={bookings}
                   onBookingSuccess={() => {}}
                 />
               </div>
