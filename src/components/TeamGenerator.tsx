@@ -165,7 +165,7 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
   };
 
   const totalPlayers = getAllPlayers().length;
-  const canGenerate = bookings.length >= 12;
+  const canGenerate = totalPlayers >= 12;
 
   return (
     <Card>
@@ -180,20 +180,20 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
           <div className="p-4 bg-muted/50 rounded-lg border border-dashed">
             <div className="text-center">
               <p className="font-medium text-muted-foreground">
-                Aguardando marcações suficientes
+                Aguardando jogadores suficientes
               </p>
               <p className="text-sm text-muted-foreground mt-1">
-                {bookings.length}/12 marcações ativas • {totalPlayers} jogadores
+                {totalPlayers}/12 jogadores • {bookings.length} marcações ativas
               </p>
               <p className="text-xs text-muted-foreground mt-2">
-                O gerador será habilitado com 12+ marcações
+                O gerador será habilitado com 12+ jogadores
               </p>
             </div>
           </div>
         ) : (
           <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg border border-primary/20">
             <div>
-              <p className="font-medium">12+ marcações ativas detectadas!</p>
+              <p className="font-medium">12+ jogadores detectados!</p>
               <p className="text-sm text-muted-foreground">
                 Total de jogadores: {totalPlayers}
               </p>
