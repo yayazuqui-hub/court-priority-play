@@ -26,9 +26,10 @@ interface GeneratedTeam {
 interface VolleyballCourtProps {
   bookings: Booking[];
   showTeamGenerator?: boolean;
+  savedTeams?: GeneratedTeam[];
 }
 
-export function VolleyballCourt({ bookings, showTeamGenerator = false }: VolleyballCourtProps) {
+export function VolleyballCourt({ bookings, showTeamGenerator = false, savedTeams }: VolleyballCourtProps) {
   const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>([]);
   const [useGeneratedTeams, setUseGeneratedTeams] = useState(false);
 
@@ -166,7 +167,11 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
   let teamAPlayers: Array<{name: string, level?: string}> = [];
   let teamBPlayers: Array<{name: string, level?: string}> = [];
 
-  if (useGeneratedTeams && generatedTeams.length >= 2) {
+  if (savedTeams && savedTeams.length >= 2) {
+    // Use saved teams first priority
+    teamAPlayers = savedTeams[0].players.map(p => ({ name: p.name, level: p.level }));
+    teamBPlayers = savedTeams[1].players.map(p => ({ name: p.name, level: p.level }));
+  } else if (useGeneratedTeams && generatedTeams.length >= 2) {
     // Use generated balanced teams
     teamAPlayers = generatedTeams[0].players.map(p => ({ name: p.name, level: p.level }));
     teamBPlayers = generatedTeams[1].players.map(p => ({ name: p.name, level: p.level }));
@@ -210,8 +215,11 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
             Quadra Atual
-            {useGeneratedTeams && (
-              <Badge className="bg-success">Times Balanceados</Badge>
+            {(savedTeams && savedTeams.length >= 2) && (
+              <Badge className="bg-success">Times Salvos</Badge>
+            )}
+            {useGeneratedTeams && !(savedTeams && savedTeams.length >= 2) && (
+              <Badge className="bg-warning">Times Temporários</Badge>
             )}
           </CardTitle>
           {showTeamGenerator && canGenerate && (

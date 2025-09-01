@@ -17,6 +17,7 @@ import volleyballLogo from '@/assets/volleyball-logo.png';
 
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [savedTeams, setSavedTeams] = useState<any[]>([]);
   const { user, signOut } = useAuth();
   const { systemState, priorityQueue, bookings, gamesSchedule, loading } = useRealtimeData();
   const navigate = useNavigate();
@@ -41,6 +42,10 @@ export default function Admin() {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleTeamsSaved = (teams: any[]) => {
+    setSavedTeams(teams);
   };
 
   if (loading || isAdmin === null) {
@@ -111,9 +116,9 @@ export default function Admin() {
           
           <PaymentForm onPaymentCreated={() => window.location.reload()} />
           
-          <VolleyballCourt bookings={bookings} showTeamGenerator={true} />
+          <VolleyballCourt bookings={bookings} showTeamGenerator={true} savedTeams={savedTeams} />
           
-          <TeamGenerator bookings={bookings} />
+          <TeamGenerator bookings={bookings} onTeamsSaved={handleTeamsSaved} />
           
           <Card className="border-primary/20 shadow-lg">
             <CardHeader className="volleyball-gradient text-white">

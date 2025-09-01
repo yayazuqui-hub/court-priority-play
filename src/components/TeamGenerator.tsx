@@ -7,6 +7,7 @@ import { Shuffle, Users, Share2 } from 'lucide-react';
 
 interface TeamGeneratorProps {
   bookings: Booking[];
+  onTeamsSaved?: (teams: GeneratedTeam[]) => void;
 }
 
 interface GeneratedTeam {
@@ -18,7 +19,7 @@ interface GeneratedTeam {
   }[];
 }
 
-export function TeamGenerator({ bookings }: TeamGeneratorProps) {
+export function TeamGenerator({ bookings, onTeamsSaved }: TeamGeneratorProps) {
   const [generatedTeams, setGeneratedTeams] = useState<GeneratedTeam[]>([]);
 
   // Extract all players from bookings
@@ -155,6 +156,12 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
     setGeneratedTeams(updatedTeams);
   };
 
+  const saveTeams = () => {
+    if (generatedTeams.length > 0 && onTeamsSaved) {
+      onTeamsSaved(generatedTeams);
+    }
+  };
+
   const exportToWhatsApp = () => {
     if (generatedTeams.length === 0) return;
 
@@ -240,6 +247,12 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Times Gerados</h3>
               <div className="flex gap-2">
+                <Button
+                  onClick={saveTeams}
+                  className="gap-2"
+                >
+                  Salvar Times
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
