@@ -153,16 +153,6 @@ export function VolleyballCourt({ bookings, showTeamGenerator = false }: Volleyb
            player.level === 'avancado' ? 'A' : '?'}
         </Badge>
       )}
-      {useGeneratedTeams && showTeamGenerator && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => movePlayerBetweenTeams(player.name, teamIndex)}
-          className="text-xs h-6 px-2 mt-1"
-        >
-          Mover
-        </Button>
-      )}
     </div>
   );
 

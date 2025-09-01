@@ -124,6 +124,37 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
     setGeneratedTeams(teams);
   };
 
+  const movePlayerBetweenTeams = (playerName: string, fromTeamId: number) => {
+    if (generatedTeams.length < 2) return;
+
+    const updatedTeams = [...generatedTeams];
+    const fromTeamIndex = updatedTeams.findIndex(team => team.id === fromTeamId);
+    if (fromTeamIndex === -1) return;
+
+    // Find the player in the source team
+    const playerIndex = updatedTeams[fromTeamIndex].players.findIndex(p => p.name === playerName);
+    if (playerIndex === -1) return;
+
+    const [player] = updatedTeams[fromTeamIndex].players.splice(playerIndex, 1);
+
+    // Find the next team (or wrap to first team)
+    const toTeamIndex = (fromTeamIndex + 1) % updatedTeams.length;
+
+    // Add player to destination team
+    if (updatedTeams[toTeamIndex].players.length < 6) {
+      updatedTeams[toTeamIndex].players.push(player);
+    } else {
+      // If destination team is full, swap with the last player
+      const lastPlayer = updatedTeams[toTeamIndex].players.pop();
+      updatedTeams[toTeamIndex].players.push(player);
+      if (lastPlayer) {
+        updatedTeams[fromTeamIndex].players.push(lastPlayer);
+      }
+    }
+
+    setGeneratedTeams(updatedTeams);
+  };
+
   const exportToWhatsApp = () => {
     if (generatedTeams.length === 0) return;
 
@@ -242,26 +273,34 @@ export function TeamGenerator({ bookings }: TeamGeneratorProps) {
                       <Badge variant="outline">{team.players.length} jogadores</Badge>
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    {team.players.map((player, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 rounded bg-muted/50"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>{getGenderEmoji(player.gender)}</span>
-                          <span className="font-medium">{player.name}</span>
-                        </div>
-                        <div className="flex gap-1">
-                          <Badge
-                            variant={getLevelBadgeVariant(player.level)}
-                            className="text-xs"
-                          >
-                            {player.level}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
+                   <CardContent className="space-y-2">
+                     {team.players.map((player, index) => (
+                       <div
+                         key={index}
+                         className="flex items-center justify-between p-2 rounded bg-muted/50"
+                       >
+                         <div className="flex items-center gap-2">
+                           <span>{getGenderEmoji(player.gender)}</span>
+                           <span className="font-medium">{player.name}</span>
+                         </div>
+                         <div className="flex gap-2">
+                           <Badge
+                             variant={getLevelBadgeVariant(player.level)}
+                             className="text-xs"
+                           >
+                             {player.level}
+                           </Badge>
+                           <Button
+                             variant="outline"
+                             size="sm"
+                             onClick={() => movePlayerBetweenTeams(player.name, team.id)}
+                             className="text-xs h-6 px-2"
+                           >
+                             Mover
+                           </Button>
+                         </div>
+                       </div>
+                     ))}
                   </CardContent>
                 </Card>
               ))}
