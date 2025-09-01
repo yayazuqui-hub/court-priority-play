@@ -12,6 +12,19 @@ interface BookingsListProps {
   isAdmin?: boolean;
 }
 
+type PlayerEntry = {
+  id: string;
+  bookingId: string;
+  playerName: string;
+  team: string;
+  level: string;
+  bookedBy: string;
+  email: string;
+  createdAt: string;
+  userId: string;
+  isOptional: boolean;
+};
+
 export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -65,25 +78,60 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
     });
   };
 
-  // Group bookings by team and level
-  const groupedBookings = bookings.reduce((acc, booking) => {
-    const team = booking.team || 'não informado';
-    const level = booking.player_level || 'não informado';
-    const key = `${team}-${level}`;
+  // Create individual player entries from bookings
+  const playerEntries: PlayerEntry[] = bookings.flatMap(booking => {
+    const entries: PlayerEntry[] = [];
+    
+    // Main player
+    entries.push({
+      id: `${booking.id}-player1`,
+      bookingId: booking.id,
+      playerName: booking.player1_name,
+      team: booking.team || 'não informado',
+      level: booking.player_level || 'não informado',
+      bookedBy: booking.profiles.name,
+      email: booking.profiles.email,
+      createdAt: booking.created_at,
+      userId: booking.user_id,
+      isOptional: false
+    });
+    
+    // Optional second player
+    if (booking.player2_name) {
+      entries.push({
+        id: `${booking.id}-player2`,
+        bookingId: booking.id,
+        playerName: booking.player2_name,
+        team: booking.team || 'não informado',
+        level: booking.player_level || 'não informado',
+        bookedBy: booking.profiles.name,
+        email: booking.profiles.email,
+        createdAt: booking.created_at,
+        userId: booking.user_id,
+        isOptional: true
+      });
+    }
+    
+    return entries;
+  });
+
+  // Group player entries by team and level
+  const groupedEntries = playerEntries.reduce((acc, entry) => {
+    const key = `${entry.team}-${entry.level}`;
     
     if (!acc[key]) {
       acc[key] = {
-        team,
-        level,
-        bookings: []
+        team: entry.team,
+        level: entry.level,
+        entries: []
       };
     }
     
-    acc[key].bookings.push(booking);
+    acc[key].entries.push(entry);
     return acc;
-  }, {} as Record<string, { team: string; level: string; bookings: Booking[] }>);
+  }, {} as Record<string, { team: string; level: string; entries: PlayerEntry[] }>);
 
-  const sortedGroups = Object.values(groupedBookings).sort((a, b) => {
+  const sortedGroups = Object.values(groupedEntries).sort((a, b) => {
     // Sort by team first (masculino, feminino), then by level (iniciante, intermediario, avancado)
     const teamOrder = { 'masculino': 0, 'feminino': 1, 'não informado': 2 };
     const levelOrder = { 'iniciante': 0, 'intermediario': 1, 'avancado': 2, 'não informado': 3 };
@@ -99,7 +147,7 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
       <CardHeader>
         <CardTitle className="text-lg flex items-center justify-between">
           Marcações Ativas
-          <Badge variant="outline">{bookings.length}</Badge>
+          <Badge variant="outline">{playerEntries.length}</Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -124,16 +172,16 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
                      '⚪ Não informado'}
                   </Badge>
                   <span className="text-sm text-muted-foreground">
-                    ({group.bookings.length} marcaç{group.bookings.length === 1 ? 'ão' : 'ões'})
+                    ({group.entries.length} jogador{group.entries.length === 1 ? '' : 'es'})
                   </span>
                 </div>
                 
                 <div className="space-y-3">
-                  {group.bookings.map((booking) => (
+                  {group.entries.map((entry) => (
                     <div
-                      key={booking.id}
+                      key={entry.id}
                       className={`p-4 rounded-lg border ${
-                        booking.user_id === user?.id
+                        entry.userId === user?.id
                           ? 'bg-primary/5 border-primary/20'
                           : 'bg-card'
                       }`}
@@ -141,33 +189,32 @@ export function BookingsList({ bookings, isAdmin = false }: BookingsListProps) {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <p className="font-medium">🏐 {booking.player1_name}</p>
-                            {booking.player2_name && (
-                              <>
-                                <span className="text-muted-foreground">+</span>
-                                <p className="font-medium">{booking.player2_name}</p>
-                              </>
+                            <p className="font-medium">🏐 {entry.playerName}</p>
+                            {entry.isOptional && (
+                              <Badge variant="outline" className="text-xs">
+                                Opcional
+                              </Badge>
                             )}
                           </div>
                           
                           <div className="text-sm text-muted-foreground space-y-1">
-                            <p>Marcado por: {booking.profiles.name}</p>
-                            <p>Email: {booking.profiles.email}</p>
-                            <p>Data: {formatDateTime(booking.created_at)}</p>
+                            <p>Marcado por: {entry.bookedBy}</p>
+                            <p>Email: {entry.email}</p>
+                            <p>Data: {formatDateTime(entry.createdAt)}</p>
                           </div>
                           
-                          {booking.user_id === user?.id && (
+                          {entry.userId === user?.id && (
                           <Badge className="mt-2 bg-success text-success-foreground">
                             Sua marcação
                           </Badge>
                           )}
                         </div>
                         
-                        {(booking.user_id === user?.id || isAdmin) && (
+                        {(entry.userId === user?.id || isAdmin) && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDeleteBooking(booking.id, booking.user_id)}
+                            onClick={() => handleDeleteBooking(entry.bookingId, entry.userId)}
                             className="text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <Trash2 className="h-4 w-4" />
