@@ -17,7 +17,14 @@ import volleyballLogo from '@/assets/volleyball-logo.png';
 
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [savedTeams, setSavedTeams] = useState<any[]>([]);
+  const [savedTeams, setSavedTeams] = useState<any[]>(() => {
+    try {
+      const stored = localStorage.getItem('savedTeams');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const { user, signOut } = useAuth();
   const { systemState, priorityQueue, bookings, gamesSchedule, loading } = useRealtimeData();
   const navigate = useNavigate();
@@ -39,15 +46,6 @@ export default function Admin() {
     checkAdminStatus();
   }, [user]);
 
-  // Carrega times salvos do localStorage
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('savedTeams');
-      if (stored) {
-        setSavedTeams(JSON.parse(stored));
-      }
-    } catch {}
-  }, []);
 
   const handleSignOut = async () => {
     await signOut();
