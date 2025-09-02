@@ -334,6 +334,10 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      is_priority_mode_active: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"

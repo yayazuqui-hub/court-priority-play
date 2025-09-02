@@ -23,6 +23,16 @@ export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQue
   const joinQueue = async () => {
     if (!user) return;
 
+    // Check if system allows queue entry
+    if (!systemState?.is_priority_mode) {
+      toast({
+        title: "Sistema pausado",
+        description: "A fila de prioridade está fechada no momento.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       // Get user profile to check gender
@@ -246,9 +256,9 @@ export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQue
           </div>
         )}
         
-        {systemState?.is_priority_mode && (
-          <div className="mt-4 flex justify-center">
-            {userInQueue ? (
+        <div className="mt-4 flex justify-center">
+          {systemState?.is_priority_mode ? (
+            userInQueue ? (
               <Button 
                 variant="outline" 
                 onClick={leaveQueue} 
@@ -265,9 +275,18 @@ export function PriorityQueueDisplay({ priorityQueue, systemState }: PriorityQue
               >
                 {loading ? 'Entrando...' : 'Entrar na Fila'}
               </Button>
-            )}
-          </div>
-        )}
+            )
+          ) : (
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">
+                Sistema pausado
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A fila de prioridade está fechada no momento
+              </p>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
